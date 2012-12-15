@@ -1,0 +1,194 @@
+
+
+@import "bootstrap/variables.less";
+@import "bootstrap/mixins.less";
+
+@cellsize: 30px;
+@totalsize: 5*@cellsize;
+
+
+
+.watch {
+	width: @totalsize;
+	padding: 3px;
+
+	.border-radius(5px);
+	background-color: @wellBackground;
+	border: 1px solid darken(@wellBackground, 10%);   
+
+	text-align: center; 
+	line-height: @cellsize;	
+
+    >div {
+    	clear: both;
+    	overflow: auto;
+    }
+
+	.cell {
+		width: @cellsize;
+		height: @cellsize;
+		cursor: default;
+		.border-radius(4px);
+
+		&.active,
+		&.active:hover {
+			.buttonBackground(@btnPrimaryBackground, spin(@btnPrimaryBackground, 20));
+			color: #fff;
+			text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+		}	
+
+		&:hover {
+			background-color: darken(@wellBackground, 10%);  
+		}	
+	}
+
+	.l1, .l5 {
+		.cell {
+			display: inline-block;
+			.ie7-inline-block();
+		}
+	}
+
+	.l2, .l3, .l4 {
+		.left {
+			float: left;
+		}
+
+		.right {
+			float: right;
+		}
+    }
+
+    .l3 .center span {
+    	vertical-align: middle;
+		display: inline-block;
+		.ie7-inline-block();  
+		padding: 0 2px;  	
+    }
+
+    input {
+    	width: 20px;
+    	margin: 0;
+    	vertical-align: top; 
+     }	
+
+    a {
+    	text-decoration: none;
+    	padding: 0 3px;
+    	vertical-align: top;
+    	font-size: 0.8em;
+    	.border-radius(3px);
+
+    	&.am {margin-right: 8px;}	
+    	
+    	&.active,
+    	&.active:hover {
+    		.buttonBackground(@btnSuccessBackground, spin(@btnSuccessBackground, 20));
+    	}
+    }
+}		
+
+	
+
+
+/*
+.watch {
+	// border: solid 1px black;
+	width: @totalsize;
+	height: @totalsize;
+	padding: 3px;
+
+	.border-radius(5px);
+	background-color: @wellBackground;
+	border: 1px solid darken(@wellBackground, 10%);    
+
+	.cell {
+		width: @cellsize;
+		height: @cellsize;
+		line-height: @cellsize;		
+		text-align: center;
+		vertical-align: middle;
+		cursor: default;
+		.border-radius(4px);
+
+		&.active,
+		&.active:hover {
+			.buttonBackground(@btnPrimaryBackground, spin(@btnPrimaryBackground, 20));
+			color: #fff;
+			text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+		}	
+
+		&:hover {
+			background-color: darken(@wellBackground, 10%);  
+		}	
+	}
+
+	.top {
+		text-align: center;
+		.cell {
+			display: inline-block;
+			.ie7-inline-block();
+		}
+	}
+
+	.middle {
+		.left {
+			float: left;
+		}
+
+		.right {
+			float: right;
+		}
+
+		>.center {
+			height: 3*@cellsize;
+			line-height: 3*@cellsize;	
+			text-align: center;	
+
+			.controls {
+	   		    display: inline-block;
+	   		    .ie7-inline-block();
+				line-height: @cellsize;
+				vertical-align: middle;  
+
+				input {
+					width: 20px;
+					margin: 0;
+					vertical-align: top; 
+				}	
+
+				a {
+					text-decoration: none;
+					padding: 0 3px;
+					.border-radius(3px);
+
+					&.am {margin-right: 5px;}	
+					&.pm {margin-left: 5px;}	
+
+					&.active,
+					&.active:hover {
+						.buttonBackground(@btnSuccessBackground, spin(@btnSuccessBackground, 20));
+					}
+				}		
+
+			}	
+
+
+
+		}
+
+	}
+
+
+	.bottom {
+		text-align: center;
+		clear: both;
+		.cell {
+			display: inline-block;
+			.ie7-inline-block();
+		}       
+	}
+
+
+}
+*/

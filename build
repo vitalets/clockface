@@ -1,0 +1,14 @@
+#clear
+#rm -rf dist/**
+
+#copy js
+# cp -R js dist/ 
+
+#build css
+#mkdir dist/css
+lessc less/watch.less > dist/css/watch.css
+
+#some stuff
+#cp README.md CHANGELOG.txt LICENSE-MIT dist/ 
+
+echo ok
