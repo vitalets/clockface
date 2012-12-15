@@ -1,5 +1,10 @@
 /**
 Watch-like timepicker
+
+Confusion at noon and midnight: 
+http://en.wikipedia.org/wiki/12-hour_clock
+In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
+
 **/
 (function ($) {
 
@@ -21,15 +26,8 @@ Watch-like timepicker
           this.$minute = this.$watch.find('input[name="minute"]'); 
           this.$am = this.$watch.find('.am');
           this.$pm = this.$watch.find('.pm');
-
-          //intial values
-          //this.hour = null;
-          //this.minute = null;
           
           this.parseFormat();
-
-          this.hours = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5];
-          this.minutes = [55, 0, 5, 50, 10, 45, 15, 40, 20, 35, 30, 25];
 
           if(this.is24) {
              this.$pm.text('12-23');
@@ -47,35 +45,101 @@ Watch-like timepicker
           this.$hour.focus($.proxy(this.focusHour, this))
                     .keyup($.proxy(this.keyupHour, this));
 
-          //focus minute 
-          this.$minute.focus($.proxy(this.focusMinute, this));
+          //focus + keyup minute 
+          this.$minute.focus($.proxy(this.focusMinute, this))
+                      .keyup($.proxy(this.keyupMinute, this));
 
 
           this.isInline = this.$element.is('div');
          
         },
 
-        show: function() {
+        show: function(value) {
             if(this.isInline) {
-                this.$element.append(this.$watch);
+                this.$element.empty().append(this.$watch);
             }
+            this.setTime(value);
+        },
 
-            var h = 23, m = 30;
-            
-            this.setAmPm('pm');
-            this.fill('hour24');
+        /*
+        render values around watch and highlight.
+        Uses actual ampm and view param: hour / minute
+        and highlight value if possible
+        */
+        render: function(view) {
+          //make viewmode: hour-am, hour-pm, minute
+          var viewmode = view === 'hour' ? view + '-' + this.ampm : view,
+              values, index, value;
 
-            this.$hour.val(h).focus();
-            this.$minute.val(m);
+          //fill values if needed
+          if(viewmode !== this.viewmode) {
+            this.viewmode = viewmode;
+            //get values to fill around watch
+            values = this.getValues();
+            this.fill(values, viewmode === 'minute');
+          } 
+
+          //read value from input
+          value = this.viewmode === 'minute' ? this.$minute.val() : this.$hour.val();
+          value = parseInt(value, 10);
+
+          //clear current
+          this.$cells.filter('.active').removeClass('active');
+
+          //get values for highlight
+          values = values || this.getValues();
+
+          //find cell index and highlight
+          index = $.inArray(value, values);
+          if(index >= 0) {
+            this.$cells.eq(index).addClass('active');
+          }
+
+          //show (hide) ampm links for 24h 
+          if(this.is24) {
+            if(viewmode === 'minute') {
+              this.$am.hide();
+              this.$pm.hide();
+            } else {
+              this.$am.show();
+              this.$pm.show();
+            }
+          }          
+        },
+
+        /*
+        returns values, depending on viewmode (0-11, 12-23, 00-55, etc)
+        */
+        getValues: function() {
+          var values = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5],
+              result = [];
+
+          switch(this.viewmode) {
+            case 'minute': 
+              $.each(values, function(i, v) { result[i] = v*5; });
+            break;
+            case 'hour-pm': 
+              if(this.is24) {
+                $.each(values, function(i, v) { result[i] = v+12; });
+              } else {
+                result = values.slice();
+                result[1] = 12; //need this to show '12' instead of '0' for pm
+              }
+            break;            
+            case 'hour-am': 
+              result = values;
+            break;            
+          }
+
+          return result;
         },
 
         /*
         Just fill any values around watch
         */ 
-        fillValues: function(values, leadZero, offset) {
-          offset = offset || 0;
+        fill: function(values, leadZero) {
           this.$cells.each(function(i){
-            var v = values[i] + offset;
+            var v = values[i];
             if(leadZero && v < 10) {
               v = '0' + v;
             }
@@ -84,38 +148,45 @@ Watch-like timepicker
         },
 
         /*
-        Fill hours or minutes around watch due to viewmode
-        */ 
-        fill: function(viewmode) {
-          if(this.viewmode === viewmode) {
-            return;
-          } else {
-            this.viewmode = viewmode;
-          }
-
-          if(viewmode === 'minute') {
-            this.fillValues(this.minutes, this.mFormat.length > 1, 0);
-          } else if(viewmode === 'hour12') {
-            this.fillValues(this.hours, false, 0);
-          } else if(viewmode === 'hour24') {
-            this.fillValues(this.hours, false, 12);
-          }
-        },      
+        Focus hour handler. Does not chnage ampm.
+        It just fills values and highlights hour
+        */
+        focusHour: function() {
+            this.render('hour');
+        },
 
         /*
-        Click handler on ampm links
-        Highlights ampm and set focus back on input. Focus will automatically re-fill values if needed.
+        Keyup hour handler.
         */
-        clickAmPm: function(e) {
-           e.preventDefault();
-           this.setAmPm($(e.target).hasClass('am') ? 'am' : 'pm');
+        keyupHour: function() {
+          clearTimeout(this.timer);
+          this.timer = setTimeout($.proxy(function() {
+            this.setAmPmByHour();
+            this.render('hour');
+          }, this), 400);
+        }, 
 
-           if(this.viewmode === 'minute') {
-              this.$minute.focus(); 
-           } else {
-              this.$hour.focus();
-           }
-        },
+        /*
+        Set ampm by hiur value in the input sothat it will be 100% highlighted
+        May correct value in input (e.g. 23 --> 11 pm)
+        */
+        setAmPmByHour: function() {
+            value = parseInt(this.$hour.val(), 10);
+            if(value > 11) {
+              this.setAmPm('pm');
+              //for 12h format correct value in input
+              if(!this.is24) {
+                this.$hour.val(value-12);
+              }
+            } else {
+              //for 24h always set am
+              if(this.is24) {
+                 this.setAmPm('am');
+              }
+              //for 12h do nothing
+            }            
+        },        
+
         /*
         Click cell handler.
         Writes new value and set focus. Focus will automatically highlight cell.
@@ -129,119 +200,38 @@ Watch-like timepicker
         },
 
         /*
-        Focus hour handler. Does not chnage ampm.
-        It just fills values and highlights hour
+        Click handler on ampm links
+        Highlights ampm and set focus on input. Focus will automatically re-fill values if needed.
         */
-        focusHour: function() {
-            var viewmode = (this.is24 && this.ampm === 'pm') ? 'hour24' : 'hour12';
-            this.fill(viewmode);
-            this.highlightHour();
+        clickAmPm: function(e) {
+           e.preventDefault();
+           this.setAmPm($(e.target).hasClass('am') ? 'am' : 'pm');
+
+           if(this.viewmode === 'minute') {
+              this.$minute.focus(); 
+           } else {
+              this.$hour.focus();
+           }
         },
-
-        /*
-        Keyup hour handler.
-        */
-        keyupHour: function() {
-          clearTimeout(this.timerH);
-          this.timerH = setTimeout($.proxy(this.setHour, this), 400);
-        }, 
-
-        /*
-        Read hour from input and highlight it if possible
-        */
-        highlightHour: function() {
-            var value = parseInt(this.$hour.val(), 10),
-            index;
-
-            //if watch filled with 24h modify value for correct search in this.hours 
-            if(this.viewmode === 'hour24') {
-              value -= 12;
-            }
-
-            index = $.inArray(value, this.hours);
-            this.highlight(index);
-        },  
-
-        /*
-        if value not defined it will be read from input.
-        Force viewmode (and ampm if 24h)
-        */
-        setHour: function(value) {
-            var viewmode = 'hour12';
-
-            clearTimeout(this.timerH);
-
-            if(value === undefined) {
-              value = this.$hour.val();
-            } else {
-              this.$hour.val(value);
-            }
-
-            value = parseInt(value, 10);
-           
-            if(this.is24) {
-                //set viewmode
-                viewmode = (value > 11) ? 'hour24' : 'hour12';              
-                //set ampm
-                this.setAmPm(viewmode === 'hour12' ? 'am' : 'pm'); 
-            }
-
-            this.fill(viewmode);
-            this.highlightHour();            
-        },              
-
+        
         /*
         Fous minute handler.
         It just fills values and highlights minute
         */
         focusMinute: function() {
-            this.fill('minute');
-            this.highlightMinute();
+            this.render('minute');
         },
 
         /*
         Keyup minute handler.
         */
         keyupMinute: function() {
-          clearTimeout(this.timerM);
-          this.timerM = setTimeout($.proxy(this.setMinute, this), 400);
+          clearTimeout(this.timer);
+          this.timer = setTimeout($.proxy(function() {
+            this.render('minute');
+          }, this), 400);
         }, 
 
-        /*
-        Read minute from input and highlight it
-        */
-        highlightMinute: function() {
-            var value = parseInt(this.$minute.val(), 10),
-                index = $.inArray(value, this.minutes);
-            this.highlight(index);
-        },    
-
-        /*
-        if value not defined it will be read from input.
-        Force viewmode
-        */
-        setMinute: function(value) {
-            clearTimeout(this.timerM);
-
-            if(value !== undefined) {
-              this.$minute.val(value);
-            }
-
-            this.fill('minute');
-            this.highlightMinute();            
-        },            
-
-        /*
-        Highlight cell in watch by index
-        */
-        highlight: function(index) {
-          this.$cells.filter('.active').removeClass('active');
-
-          if(index >= 0) {
-            this.$cells.eq(index).addClass('active');
-          }
-        },
-    
         /*
         Highlight am / pm links
         */
@@ -259,10 +249,6 @@ Watch-like timepicker
             this.$pm.addClass('active');
             this.$am.removeClass('active');
           }
-        },
-       
-        parseTime: function(value) {
-
         },
 
         /*
@@ -294,6 +280,88 @@ Watch-like timepicker
 
           this.hFormat = hFormat;
           this.mFormat = mFormat;
+        },
+
+        /*
+        Parse value passed as string or Date object
+        */
+        parseTime: function(value) {
+          var d = new Date(),
+              hour = d.getHours(), 
+              minute = '00', 
+              ampm = 'am', 
+              parts;
+
+          if(value instanceof Date) {
+            hour = value.getHours();
+            minute = value.getMinutes();
+          } else if(typeof value === 'string' && value.length) {
+            //parse from string
+            //see http://stackoverflow.com/questions/141348/what-is-the-best-way-to-parse-a-time-into-a-date-object-from-user-input-in-javas
+            parts = value.match(/(\d\d?)([:\-\.]?(\d\d?))?\s*(a|p)?/i);
+            if(parts.length) {
+                hour = parseInt(parts[1], 10);
+                minute = parseInt(parts[3], 10);
+                if(parts[4]) {
+                  ampm = parts[4].toLowerCase() === 'a' ? 'am' : 'pm';
+                }
+            }
+          } 
+
+          if(minute < 10) {
+            minute = '0' + minute;
+          } 
+
+          return {hour: hour, minute: minute, ampm: ampm};
+        },
+
+        /*
+        Returns time as string in specified format
+        */
+        getTime: function() {
+          var hour = parseInt(this.$hour.val(), 10),
+              minute = parseInt(this.$minute.val(), 10),
+              result = this.options.format;
+
+          if(this.hFormat.length > 1 && hour < 10) {
+            hour = '0' + hour;
+          }   
+
+          if(this.mFormat.length > 1 && minute < 10) {
+            minute = '0' + minute;
+          }
+
+          result = result.replace(this.hFormat, hour).replace(this.mFormat, minute);
+          if(!this.is24) {
+            if(result.indexOf('A') !== -1) {
+               result = result.replace('A', this.ampm.toUpperCase());
+            } else {
+               result = result.replace('a', this.ampm);
+            }
+          }
+
+          return result;
+        },
+
+        /*
+        Set time of watch.
+        Value can be Date object or string
+        */
+        setTime: function(value) {
+            //initial hour and minute
+            var res = this.parseTime(value);
+
+            this.$hour.val(res.hour);
+            this.$minute.val(res.minute);
+
+            //for 12h and hour <= 11 set ampm manually from value
+            if(!this.is24 && res.hour <= 11) {
+              this.setAmPm(res.ampm);
+            } else { //calc ampm automatically
+              this.setAmPmByHour();
+            }
+
+            this.$hour.focus();
         }
     };
 
@@ -329,7 +397,8 @@ Watch-like timepicker
           '<div class="l2">' +
                 '<div class="cell left"></div>' +
                 '<div class="cell right"></div>' +
-                '<div class="center"><a href="#" class="am active">am</a><a href="#" class="pm">pm</a></div>' +
+                // '<div class="center"><a href="#" class="am active">am</a><a href="#" class="pm">pm</a></div>' +
+                '<div class="center"><a href="#" class="am active">am</a></div>' +
           '</div>'+
           '<div class="l3">' +
                 '<div class="cell left"></div>' +
@@ -339,7 +408,8 @@ Watch-like timepicker
           '<div class="l4">' +
                 '<div class="cell left"></div>' +
                 '<div class="cell right"></div>' +
-                '<div class="center"><a href="#" class="now">now</a></div>' +
+                // '<div class="center"><button class="btn btn-mini" type="button">ok</button></div>' +
+                '<div class="center"></div>' +
           '</div>'+
           '<div class="l5">' +
                 '<div class="cell"></div>' +
@@ -347,41 +417,5 @@ Watch-like timepicker
                 '<div class="cell"></div>' +
           '</div>'+
       '</div>';  
-
-/*
-    $.fn.watch.template = ''+
-      '<div class="watch">' +
-          '<div class="top">' +
-              '<div class="cell"></div>' +
-              '<div class="cell"></div>' +
-              '<div class="cell"></div>' +
-          '</div>' +
-          '<div class="middle">' +
-              '<div class="left">' +
-                  '<div class="cell"></div>' +
-                  '<div class="cell center"></div>' +
-                  '<div class="cell"></div>' +
-              '</div>' +
-              '<div class="right">' +
-                  '<div class="cell"></div>' +
-                  '<div class="cell center"></div>' +
-                  '<div class="cell"></div>' +
-              '</div>' +
-              '<div class="center">'+
-                  '<div class="controls">'+
-                     '<div><a href="#" class="am active">am</a><a href="#" class="pm">pm</a></div>' +
-                     '<div><input type="text" name="hour" maxlength="2">:<input type="text" name="minute" maxlength="2"></div>' +
-                     '<div><a href="#" class="now">now</a></div>' +
-                  '</div>' +
-              '</div>' +
-          '</div>' +
-          '<div class="bottom">' +
-              '<div class="cell"></div>' +
-              '<div class="cell center"></div>' +
-              '<div class="cell"></div>' +
-          '</div>' +  
-      '</div>';  
-*/
-
 
 }(window.jQuery));
