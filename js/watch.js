@@ -24,19 +24,17 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
           this.$cells = this.$watch.find('.cell'); 
           this.$hour = this.$watch.find('input[name="hour"]'); 
           this.$minute = this.$watch.find('input[name="minute"]'); 
-          this.$am = this.$watch.find('.am');
-          this.$pm = this.$watch.find('.pm');
+          this.$ampm = this.$watch.find('.ampm');
           
           this.parseFormat();
 
           if(this.is24) {
-             this.$pm.text('12-23');
-             this.$am.text('0-11').css('margin-left', '4px');
+             this.options.am = '12-23';
+             this.options.pm = '0-11';
           } 
 
           //click am/pm 
-          this.$am.click($.proxy(this.clickAmPm, this));
-          this.$pm.click($.proxy(this.clickAmPm, this));
+          this.$ampm.click($.proxy(this.clickAmPm, this));
 
           //click cell
           this.$watch.on('click', '.cell', $.proxy(this.clickCell, this));
@@ -98,11 +96,9 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
           //show (hide) ampm links for 24h 
           if(this.is24) {
             if(viewmode === 'minute') {
-              this.$am.hide();
-              this.$pm.hide();
+               this.$ampm.hide();
             } else {
-              this.$am.show();
-              this.$pm.show();
+               this.$ampm.show();
             }
           }          
         },
@@ -172,18 +168,25 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
         */
         setAmPmByHour: function() {
             value = parseInt(this.$hour.val(), 10);
-            if(value > 11) {
+
+            //'24' always '0'
+            if(value === 24) {
+              value = 0;
+              this.$hour.val(value);
+            }
+
+            if(value > 11 && value < 24) {
               this.setAmPm('pm');
               //for 12h format correct value in input
-              if(!this.is24) {
+              if(!this.is24 && value > 12) {
                 this.$hour.val(value-12);
               }
-            } else {
-              //for 24h always set am
-              if(this.is24) {
+            } else if(value >= 0 && value < 11) {
+              //always set am for 24h and for '0' in 12h 
+              if(this.is24 || value === 0) {
                  this.setAmPm('am');
-              }
-              //for 12h do nothing
+              } 
+              //otherwise do nothing with ampm
             }            
         },        
 
@@ -205,7 +208,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
         */
         clickAmPm: function(e) {
            e.preventDefault();
-           this.setAmPm($(e.target).hasClass('am') ? 'am' : 'pm');
+           this.setAmPm(this.ampm === 'am' ? 'pm' : 'am');
 
            if(this.viewmode === 'minute') {
               this.$minute.focus(); 
@@ -242,13 +245,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
              this.ampm = value;
           }
 
-          if(this.ampm === 'am') {
-            this.$pm.removeClass('active');
-            this.$am.addClass('active');
-          } else {
-            this.$pm.addClass('active');
-            this.$am.removeClass('active');
-          }
+          this.$ampm.text(this.ampm === 'am' ? this.options.am : this.options.pm);
         },
 
         /*
@@ -383,7 +380,9 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
     
     $.fn.watch.defaults = {
         //see http://momentjs.com/docs/#/displaying/format/
-        format: 'H:mm'
+        format: 'H:mm',
+        am: 'AM',
+        pm: 'PM'
     };
    
 
@@ -398,7 +397,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
                 '<div class="cell left"></div>' +
                 '<div class="cell right"></div>' +
                 // '<div class="center"><a href="#" class="am active">am</a><a href="#" class="pm">pm</a></div>' +
-                '<div class="center"><a href="#" class="am active">am</a></div>' +
+                '<div class="center"><a href="#" class="ampm"></a></div>' +
           '</div>'+
           '<div class="l3">' +
                 '<div class="cell left"></div>' +
