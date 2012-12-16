@@ -1,30 +1,30 @@
 /**
-Watch-like timepicker
+Clockface timepicker
 
-Confusion at noon and midnight: 
+Confusion with noon and midnight: 
 http://en.wikipedia.org/wiki/12-hour_clock
-In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
+In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
 
 **/
 (function ($) {
 
-    var Watch = function (element, options) {
+    var Clockface = function (element, options) {
         this.$element = $(element);
-        this.options = $.extend({}, $.fn.watch.defaults, options);
+        this.options = $.extend({}, $.fn.clockface.defaults, options);
         this.init();  
      };
 
-    Watch.prototype = {
-        constructor: Watch, 
+    Clockface.prototype = {
+        constructor: Clockface, 
         init: function () {
           var that = this;
 
           //iquery objects
-          this.$watch = $($.fn.watch.template);
-          this.$cells = this.$watch.find('.cell'); 
-          this.$hour = this.$watch.find('input[name="hour"]'); 
-          this.$minute = this.$watch.find('input[name="minute"]'); 
-          this.$ampm = this.$watch.find('.ampm');
+          this.$clockface = $($.fn.clockface.template);
+          this.$cells = this.$clockface.find('.cell'); 
+          this.$hour = this.$clockface.find('input[name="hour"]'); 
+          this.$minute = this.$clockface.find('input[name="minute"]'); 
+          this.$ampm = this.$clockface.find('.ampm');
           
           this.parseFormat();
 
@@ -37,7 +37,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
           this.$ampm.click($.proxy(this.clickAmPm, this));
 
           //click cell
-          this.$watch.on('click', '.cell', $.proxy(this.clickCell, this));
+          this.$clockface.on('click', '.cell', $.proxy(this.clickCell, this));
 
           //focus + keyup hour
           this.$hour.focus($.proxy(this.focusHour, this))
@@ -54,13 +54,13 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
 
         show: function(value) {
             if(this.isInline) {
-                this.$element.empty().append(this.$watch);
+                this.$element.empty().append(this.$clockface);
             }
             this.setTime(value);
         },
 
         /*
-        render values around watch and highlight.
+        render values around clockface and highlight.
         Uses actual ampm and view param: hour / minute
         and highlight value if possible
         */
@@ -72,7 +72,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
           //fill values if needed
           if(viewmode !== this.viewmode) {
             this.viewmode = viewmode;
-            //get values to fill around watch
+            //get values to fill around clockface
             values = this.getValues();
             this.fill(values, viewmode === 'minute');
           } 
@@ -131,7 +131,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
         },
 
         /*
-        Just fill any values around watch
+        Just fill any values around clockface
         */ 
         fill: function(values, leadZero) {
           this.$cells.each(function(i){
@@ -341,7 +341,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
         },
 
         /*
-        Set time of watch.
+        Set time of clockface.
         Value can be Date object or string
         */
         setTime: function(value) {
@@ -362,15 +362,15 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
         }
     };
 
-    $.fn.watch = function ( option ) {
+    $.fn.clockface = function ( option ) {
         var args = Array.apply(null, arguments);
         args.shift();
         return this.each(function () {
             var $this = $(this),
-            data = $this.data('watch'),
+            data = $this.data('clockface'),
             options = typeof option == 'object' && option;
             if (!data) {
-                $this.data('watch', (data = new Watch(this, options)));
+                $this.data('clockface', (data = new Clockface(this, options)));
             }
             if (typeof option == 'string' && typeof data[option] == 'function') {
                 data[option].apply(data, args);
@@ -378,7 +378,7 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
         });
     };  
     
-    $.fn.watch.defaults = {
+    $.fn.clockface.defaults = {
         //see http://momentjs.com/docs/#/displaying/format/
         format: 'H:mm',
         am: 'AM',
@@ -386,8 +386,8 @@ In this watch considered '00:00 am' as midnight and '12:00 pm' as noon.
     };
    
 
- $.fn.watch.template = ''+
-      '<div class="watch">' +
+ $.fn.clockface.template = ''+
+      '<div class="clockface">' +
           '<div class="l1">' +
               '<div class="cell"></div>' +
               '<div class="cell"></div>' +

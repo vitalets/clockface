@@ -1,14 +1,16 @@
-#clear
-#rm -rf dist/**
+if [ $(expr match $1 ".*css.*") -gt 0 ] 
+then
+  rm -rf css/**
+  lessc less/clockface.less > css/clockface.css
+  echo css ok
+fi
 
-#copy js
-# cp -R js dist/ 
-
-#build css
-#mkdir dist/css
-lessc less/watch.less > dist/css/watch.css
-
-#some stuff
-#cp README.md CHANGELOG.txt LICENSE-MIT dist/ 
-
-echo ok
+if [ $(expr match $1 ".*dist.*") -gt 0 ] 
+then
+  rm -rf dist
+  mkdir dist
+  cp -R css dist/ 
+  cp -R js dist/ 
+  cp README.md CHANGELOG.txt LICENSE-MIT dist/ 
+  echo dist ok
+fi
