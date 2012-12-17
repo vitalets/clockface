@@ -21,6 +21,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           this.$clockface = $($.fn.clockface.template);
           this.$clockface.find('.l1 .cell, .left.cell').html('<div class="outer"></div><div class="inner"></div>'); 
           this.$clockface.find('.l5 .cell, .right.cell').html('<div class="inner"></div><div class="outer"></div>'); 
+          this.$clockface.hide();
 
           this.$outer = this.$clockface.find('.outer');
           this.$inner = this.$clockface.find('.inner');
@@ -38,6 +39,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           this.$clockface.on('click', '.cell', $.proxy(this.click, this));
 
           this.parseFormat();
+          this.prepareRegexp();
 
           if(this.is24) {
              this.options.am = '12-23';
@@ -45,43 +47,86 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           } 
 
           this.isInline = this.$element.is('div');
+          if(this.isInline) {
+            this.$clockface.addClass('clockface-inline').appendTo(this.$element);
+          } else {
+            this.$clockface.addClass('dropdown-menu').appendTo('body');
+            this.$element.on({
+              'focus.clockface': $.proxy(function(e) {
+                 this.show();
+              }, this)
+            });
+
+            // Click outside hide it
+            $(document).on('click', $.proxy(function (e) {
+                if ($(e.target).closest('.clockface').length || $(e.target)[0] === this.$element[0]) {
+                  return;
+                }
+                this.hide();
+            }, this));
+          }
          
+
+
           //fill minutes once
           this.fill('minute');
-        },
-
-        /*
-        returns values of hours or minutes, depend on ampm and 24/12 format (0-11, 12-23, 00-55, etc)
-        param what: 'hour'/'minute'
-        */
-        getValues: function(what) {
-          var values = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5],
-              result = [];
-
-          if(what === 'minute') {
-              $.each(values, function(i, v) { result[i] = v*5; });
-          } else if(this.ampm === 'pm') {
-              if(this.is24) {
-                $.each(values, function(i, v) { result[i] = v+12; });
-              } else {
-                result = values.slice();
-                result[1] = 12; //need this to show '12' instead of '0' for 12h pm
-              }
-          } else {
-             result = values.slice();
-          }
-          return result;
         },
 
         /*
         Displays widget with specified value
         */
         show: function(value) {
-            if(this.isInline) {
-                this.$element.empty().append(this.$clockface);
+            if(this.$clockface.is(':visible')) {
+              return;
+            }
+            this.$clockface.show();
+            if(!this.isInline) {
+                if(value === undefined) {
+                  value = this.$element.val();
+                }
+                this.$element.on({
+                  'keydown.clockface': $.proxy(this.keydown, this)
+                });
+                this.$clockface.show();
+                this.place();
+                $(window).on('resize.clockface', $.proxy(this.place, this));
             }
             this.setTime(value);
         },
+
+        hide: function() {
+            this.$clockface.hide();
+            if(!this.isInline) {
+                this.$element.off('keydown.clockface');
+                $(window).off('resize.clockface');
+            }
+        },
+
+        /*
+        Place widget below input
+        */
+        place: function(){
+          var zIndex = parseInt(this.$element.parents().filter(function() {
+                   return $(this).css('z-index') != 'auto';
+             }).first().css('z-index'))+10,
+             offset = this.$element.offset();
+          this.$clockface.css({
+            top: offset.top + this.$element.outerHeight(),
+            left: offset.left,
+            zIndex: zIndex
+          });
+        },  
+
+        /*
+        keydown handler (for not inline mode)
+        */
+        keydown: function(e) {
+          clearTimeout(this.timer);  
+          this.timer = setTimeout($.proxy(function(){
+            console.log(e);
+            this.setTime(this.$element.val());
+          }, this), 400);
+        },      
 
         /*
         Set ampm and re-fill hours
@@ -90,7 +135,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           if(value === this.ampm) {
              return;
           } else {
-             this.ampm = value;
+             this.ampm = value === 'am' ? 'am' : 'pm';
           }
 
           //set link's text
@@ -98,12 +143,26 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
 
           this.fill('hour');
           this.highlight('hour');
+          if(!this.isInline && !this.is24) {
+            this.$element.val(this.getTime());
+          }
         },   
         /*
         Sets hour value and highlight if possible
         */
         setHour: function(value) {
-          this.hour = parseInt(value, 10);
+          value = parseInt(value, 10);
+          value = isNaN(value) ? null : value;
+          if(value < 0 || value > 23) {
+            value = null;
+          }
+
+          if(value === this.hour) {
+            return;
+          } else {
+            this.hour = value;
+          }
+
           this.highlight('hour');
         },
 
@@ -111,7 +170,18 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         Sets minute value and highlight
         */
         setMinute: function(value) {
-          this.minute = parseInt(value, 10);
+          value = parseInt(value, 10);
+          value = isNaN(value) ? null : value;
+          if(value < 0 || value > 59) {
+            value = null;
+          }
+
+          if(value === this.minute) {
+            return;
+          } else {
+            this.minute = value;
+          }
+
           this.highlight('minute');
         },        
 
@@ -151,18 +221,45 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         },          
 
         /*
+        returns values of hours or minutes, depend on ampm and 24/12 format (0-11, 12-23, 00-55, etc)
+        param what: 'hour'/'minute'
+        */
+        getValues: function(what) {
+          var values = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5],
+              result = [];
+
+          if(what === 'minute') {
+              $.each(values, function(i, v) { result[i] = v*5; });
+          } else if(this.ampm === 'pm') {
+              if(this.is24) {
+                $.each(values, function(i, v) { result[i] = v+12; });
+              } else {
+                result = values.slice();
+                result[1] = 12; //need this to show '12' instead of '0' for 12h pm
+              }
+          } else {
+             result = values.slice();
+          }
+          return result;
+        },
+
+        /*
         Click cell handler.
         Stores hour/minute and highlights.
         On second click deselect value
         */
         click: function(e) {
           var $target = $(e.target),
-              value = parseInt($target.text(), 10);
+              value = $target.hasClass('active') ? null : $target.text();
           if($target.hasClass('inner')) {
-            this.setHour(value !== this.hour ? value : null);
+            this.setHour(value);
           } else {
-            this.setMinute(value !== this.minute ? value : null);
+            this.setMinute(value);
           }
+
+          if(!this.isInline) {
+            this.$element.val(this.getTime());
+          }          
         },
 
         /*
@@ -206,56 +303,153 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         },
 
         /*
+        Set time of clockface. Am/pm will be set automatically.
+        Value can be Date object or string
+        */
+        setTime: function(value) {
+          var res = {hour: null, minute: null, ampm: 'am'};
+
+          if(value instanceof Date) {
+            res.hour = value.getHours();
+            res.minute = value.getMinutes();
+          }
+
+          if(typeof value === 'string' && value.length) { 
+             //parse value from string
+             res = this.parseTime(value);
+          }
+
+          //'24' always '0'
+          if(res.hour === 24) {
+              res.hour = 0;
+          }
+
+          //try to set ampm automatically
+          if(res.hour > 11 && res.hour < 24) {
+            res.ampm = 'pm';
+            //for 12h format correct value 
+            if(!this.is24 && res.hour > 12) {
+              res.hour -= 12;
+            }
+          } else if(res.hour >= 0 && res.hour < 11) {
+                //always set am for 24h and for '0' in 12h 
+                if(this.is24 || res.hour === 0) {
+                   res.ampm = 'am';
+               } 
+                //otherwise ampm should be defined in value itself and stored in res when parsing
+          }      
+
+          this.setAmPm(res.ampm);
+          this.setHour(res.hour);
+          this.setMinute(res.minute);
+        },
+
+        /*
         Parse value passed as string or Date object
         */
         parseTime: function(value) {
-          var d = new Date(),
-              hour = d.getHours(), 
-              minute = 0, 
+          var hour = null, 
+              minute = null, 
               ampm = 'am', 
-              reg, parts, sep;
+              parts = [], digits;
 
-          if(value instanceof Date) {
-            hour = value.getHours();
-            minute = value.getMinutes();
-          } else if(typeof value === 'string' && value.length) {
-            //try take additional separator from format
-            sep = this.options.format.match(/h([^hm]?)m/i);
-            if(sep && sep.length && sep[1] !== ':') {
-              sep = '[:\\\\'+sep[1]+']?';
-            } else {
-              sep = ':?';
+            value = value.trim();
+
+            //try parse time from string assuming separator exist
+            if(this.regexpSep) {
+                parts = value.match(this.regexpSep);
             }
+
+            if(parts && parts.length) {
+              hour = parts[1] ? parseInt(parts[1], 10) : null;
+              minute = parts[2] ? parseInt(parts[2], 10): null;
+              ampm = (!parts[3] || parts[3].toLowerCase() === 'a') ? 'am' : 'pm';
+            } else {
+              //if parse with separator failed, search for 1,4-digit block and process it
+              //use reversed string to start from end (usefull with full dates)
+              //see http://stackoverflow.com/questions/141348/what-is-the-best-way-to-parse-a-time-into-a-date-object-from-user-input-in-javas
+              value = value.split('').reverse().join('').replace(/\s/g, '');
+              parts = value.match(this.regexpNoSep);
+              if(parts && parts.length) {
+                ampm = (!parts[1] || parts[1].toLowerCase() === 'a') ? 'am' : 'pm';
+                //reverse back
+                digits = parts[2].split('').reverse().join('');
+                //use smart analyzing to detect hours and minutes
+                switch(digits.length) {
+                  case 1:
+                    hour = parseInt(digits, 10); //e.g. '6'
+                  break;
+                  case 2:
+                    hour = parseInt(digits, 10); //e.g. '16'
+                    //if((this.is24 && hour > 24) || (!this.is24 && hour > 12)) { //e.g. 26
+                    if(hour > 24) { //e.g. 26
+                      hour = parseInt(digits[0], 10);
+                      minute = parseInt(digits[1], 10);
+                    }
+                  break;
+                  case 3:
+                    hour = parseInt(digits[0], 10);  //e.g. 105
+                    minute = parseInt(digits[1]+digits[2], 10); 
+                    if(minute > 59) { 
+                      hour = parseInt(digits[0]+digits[1], 10); //e.g. 195
+                      minute = parseInt(digits[2], 10); 
+                      if(hour > 24) {
+                        hour = null;
+                        minute = null;
+                      }
+                    }
+                  break;
+                  case 4:
+                    hour = parseInt(digits[0]+digits[1], 10); //e.g. 2006
+                    minute = parseInt(digits[2]+digits[3], 10);
+                    if(hour > 24) {
+                      hour = null;
+                    }
+                    if(minute > 59) {
+                      minute = null;
+                    }
+                }
+              }
+            }
+
+          return {hour: hour, minute: minute, ampm: ampm};
+        },
+
+        prepareRegexp: function() {
+            //take separator from format
+            var sep = this.options.format.match(/h\s*([^hm]?)\s*m/i); //HH-mm, HH:mm
+            if(sep && sep.length) {
+              sep = sep[1];
+            } 
+
+            //sep can be null for HH, and '' for HHmm 
+            this.separator = sep;
     
             //parse from string
             //use reversed string and regexp to parse 2-digit minutes first
             //see http://stackoverflow.com/questions/141348/what-is-the-best-way-to-parse-a-time-into-a-date-object-from-user-input-in-javas
-            value = value.trim().split('').reverse().join('');
-            reg = new RegExp('(a|p)?\\s*((\\d\\d)' + sep + ')?(\\d\\d?)', 'i');
-            parts = value.match(reg);
-            if(parts.length) {
-                hour = parts[4] ? parseInt(parts[4].split('').reverse().join(''), 10) : null;
-                minute = parts[3] ? parseInt(parts[3].split('').reverse().join(''), 10): null;
-                ampm = (!parts[1] || parts[1].toLowerCase() === 'a') ? 'am' : 'pm';
-            }
-          } 
+            //this.regexp = new RegExp('(a|p)?\\s*((\\d\\d?)' + sep + ')?(\\d\\d?)', 'i');
 
-          return {hour: hour, minute: minute, ampm: ampm};
+            //regexp, used with separator
+            this.regexpSep = (this.separator && this.separator.length) ? new RegExp('(\\d\\d?)\\s*\\' + this.separator + '\\s*(\\d?\\d?)\\s*(a|p)?', 'i') : null;
+
+            //second regexp applied if previous has no result or separator is empty (to reversed string)
+            this.regexpNoSep = new RegExp('(a|p)?\\s*(\\d{1,4})', 'i');
         },
 
         /*
         Returns time as string in specified format
         */
         getTime: function() {
-          var hour = this.hour,
-              minute = this.minute,
+          var hour = this.hour !== null ? this.hour + '' : '',
+              minute = this.minute !== null ? this.minute + '' : '',
               result = this.options.format;
 
-          if(this.hFormat.length > 1 && hour < 10) {
+          if(this.hFormat.length > 1 && hour.length === 1) {
             hour = '0' + hour;
           }   
 
-          if(this.mFormat.length > 1 && minute < 10) {
+          if(this.mFormat.length > 1 && minute.length === 1) {
             minute = '0' + minute;
           }
 
@@ -269,40 +463,9 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           }
 
           return result;
-        },
-
-        /*
-        Set time of clockface. Am/pm will be set automatically.
-        Value can be Date object or string
-        */
-        setTime: function(value) {
-            //parse value
-            var res = this.parseTime(value);
-
-            //'24' always '0'
-            if(res.hour === 24) {
-              res.hour = 0;
-            }
-
-            //try to set ampm automatically
-            if(res.hour > 11 && res.hour < 24) {
-              res.ampm = 'pm';
-              //for 12h format correct value 
-              if(!this.is24 && res.hour > 12) {
-                res.hour -= 12;
-              }
-            } else if(res.hour >= 0 && res.hour < 11) {
-              //always set am for 24h and for '0' in 12h 
-              if(this.is24 || res.hour === 0) {
-                 res.ampm = 'am';
-              } 
-              //otherwise ampm should be defined in value itself and stored in res when parsing
-            }      
-
-            this.setAmPm(res.ampm);
-            this.setHour(res.hour);
-            this.setMinute(res.minute);
         }
+
+
     };
 
     $.fn.clockface = function ( option ) {
