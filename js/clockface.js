@@ -92,6 +92,8 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
                 $(window).on('resize.clockface', $.proxy(this.place, this));
             }
             this.setTime(value);
+
+
         },
 
         hide: function() {
@@ -121,11 +123,17 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         keydown handler (for not inline mode)
         */
         keydown: function(e) {
-          clearTimeout(this.timer);  
+          //tab, escape, enter --> hide
+          if(/(9|27|13)/.test(e.which)) {
+            this.hide();
+            return;
+          } 
+
+          clearTimeout(this.timer);
           this.timer = setTimeout($.proxy(function(){
             console.log(e);
             this.setTime(this.$element.val());
-          }, this), 400);
+          }, this), 500);
         },      
 
         /*
@@ -445,12 +453,21 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
               minute = this.minute !== null ? this.minute + '' : '',
               result = this.options.format;
 
+          if(!hour.length && !minute.length) {
+            return '';
+          }   
+
           if(this.hFormat.length > 1 && hour.length === 1) {
             hour = '0' + hour;
           }   
 
           if(this.mFormat.length > 1 && minute.length === 1) {
             minute = '0' + minute;
+          }
+
+          //delete separator if no minutes
+          if(!minute.length && this.separator) {
+            result = result.replace(this.separator, '');
           }
 
           result = result.replace(this.hFormat, hour).replace(this.mFormat, minute);
