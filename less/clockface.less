@@ -49,7 +49,7 @@
         color: gray;
         &.active,
         &.active:hover {
-            .buttonBackground(@btnSuccessBackground, spin(@btnSuccessBackground, 20));
+            .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
         }        
     }
 
@@ -57,7 +57,7 @@
         font-size: 0.8em;
         &.active,
         &.active:hover {
-            .buttonBackground(@btnPrimaryBackground, spin(@btnPrimaryBackground, 20));
+            .buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
         }        
     }
 
