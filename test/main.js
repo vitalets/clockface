@@ -190,7 +190,7 @@ test("getTime", function () {
 
   f = 'h:mm a';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '6:71 pm');
-  equal(e.data('clockface').getTime(), '6: pm', f+'null minute ok');    
+  equal(e.data('clockface').getTime(), '6 pm', f+'null minute ok');    
 });
 
 
