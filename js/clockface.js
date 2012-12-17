@@ -365,7 +365,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
               ampm = 'am', 
               parts = [], digits;
 
-            value = value.trim();
+            value = $.trim(value);
 
             //try parse time from string assuming separator exist
             if(this.regexpSep) {
