@@ -122,7 +122,42 @@ test("parse value from string", function () {
         }
       }
     } 
- });  
+
+    //only hours format
+    str = '6';
+    ok(true, str);
+    e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'H'}).clockface('show', str);
+    o = e.data('clockface');
+    equal(o.hour, hour, 'hour ok');
+    equal(o.minute, null, 'minute ok');
+    equal(o.ampm, 'am', 'ampm ok');     
+
+    str = '6 pm';
+    ok(true, str);
+    e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'hh a'}).clockface('show', str);
+    o = e.data('clockface');
+    equal(o.hour, hour, 'hour ok');
+    equal(o.minute, null, 'minute ok');
+    equal(o.ampm, 'pm', 'ampm ok');     
+ }); 
+
+test("incorrect input value", function () { 
+    var o, e;
+    e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'h:mm a'}).clockface('show', '56:23');
+    o = e.data('clockface');
+    equal(o.hour, null, 'hour ok');
+    equal(o.minute, 23, 'minute ok');
+
+    e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'h:mm a'}).clockface('show', '6:84');
+    o = e.data('clockface');
+    equal(o.hour, 6, 'hour ok');
+    equal(o.minute, null, 'minute ok');    
+
+    e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'h:mm a'}).clockface('show', '56:84');
+    o = e.data('clockface');
+    equal(o.hour, null, 'hour ok');
+    equal(o.minute, null, 'minute ok');     
+});
 
 test("click hour / minute", function () {
   var  e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'H:mm'}).clockface('show', '12:00'),
@@ -141,6 +176,16 @@ test("click hour / minute", function () {
   ok(o.$outer.eq(2).hasClass('active'), 'new cell selected');
   ok(!o.$outer.eq(1).hasClass('active'), 'old cell deselected');
   ok(o.$inner.eq(2).hasClass('active'), 'hour not changed');
+
+  //hour second click (deselect)
+  o.$inner.eq(2).click();
+  ok(!o.$inner.eq(2).hasClass('active'), 'hour deselected on second click');
+  equal(o.hour, null, 'hour is null');
+
+  //minute second click (deselect)
+  o.$outer.eq(2).click();
+  ok(!o.$outer.eq(2).hasClass('active'), 'minute deselected on second click');
+  equal(o.minute, null, 'minute is null');
 });
 
 test("click ampm", function () {
@@ -183,6 +228,10 @@ test("getTime", function () {
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01');
   equal(e.data('clockface').getTime(), '01:01', f+' ok');
 
+  f = 'HH';
+  e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01');
+  equal(e.data('clockface').getTime(), '01', f+' ok');  
+
   f = 'h:mm a';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01 pm');
   equal(e.data('clockface').getTime(), '1:01 pm', f+' ok');
@@ -194,6 +243,19 @@ test("getTime", function () {
   f = 'hh:mm';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01 pm');
   equal(e.data('clockface').getTime(), '01:01', f+' ok');  
+
+  f = 'h a';
+  e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1 pm');
+  equal(e.data('clockface').getTime(), '1 pm', f+' ok');    
+
+  //null values
+  f = 'hh:mm';
+  e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '56:01 pm');
+  equal(e.data('clockface').getTime(), ':01', 'null hour ok');  
+
+  f = 'h:mm a';
+  e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '6:71 pm');
+  equal(e.data('clockface').getTime(), '6: pm', f+'null minute ok');    
 });
 
 
