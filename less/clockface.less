@@ -3,10 +3,8 @@
 @import "bootstrap/mixins.less";
 
 @cellsize: 20px;
-
 //delta between inner and outer
 @delta: 4px;
-
 @totalsize: 7*@cellsize + 2*@delta;
 
 
@@ -14,11 +12,6 @@
 .clockface {
 	width: @totalsize;
 	padding: 3px;
-
-	.border-radius(5px);
-	background-color: @wellBackground;
-	border: 1px solid darken(@wellBackground, 10%);   
-	
     text-align: center; 
 
     >div {
