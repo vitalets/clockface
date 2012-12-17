@@ -93,7 +93,11 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
             }
             this.setTime(value);
 
-
+            //replace value of element on more correct
+            var time = this.getTime();
+            if(!this.isInline && time !== this.$element.val()) {
+              this.$element.val(time);
+            }
         },
 
         hide: function() {
