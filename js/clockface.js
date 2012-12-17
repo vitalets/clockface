@@ -213,21 +213,30 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
               hour = d.getHours(), 
               minute = 0, 
               ampm = 'am', 
-              parts;
+              reg, parts, sep;
 
           if(value instanceof Date) {
             hour = value.getHours();
             minute = value.getMinutes();
           } else if(typeof value === 'string' && value.length) {
+            //try take additional separator from format
+            sep = this.options.format.match(/h([^hm]?)m/i);
+            if(sep && sep.length && sep[1] !== ':') {
+              sep = '[:\\\\'+sep[1]+']?';
+            } else {
+              sep = ':?';
+            }
+    
             //parse from string
+            //use reversed string and regexp to parse 2-digit minutes first
             //see http://stackoverflow.com/questions/141348/what-is-the-best-way-to-parse-a-time-into-a-date-object-from-user-input-in-javas
-            parts = value.match(/(\d\d?)([:\-\.]?(\d\d?))?\s*(a|p)?/i);
+            value = value.trim().split('').reverse().join('');
+            reg = new RegExp('(a|p)?\\s*((\\d\\d)' + sep + ')?(\\d\\d?)', 'i');
+            parts = value.match(reg);
             if(parts.length) {
-                hour = parseInt(parts[1], 10);
-                minute = parseInt(parts[3], 10);
-                if(parts[4]) {
-                  ampm = parts[4].toLowerCase() === 'a' ? 'am' : 'pm';
-                }
+                hour = parts[4] ? parseInt(parts[4].split('').reverse().join(''), 10) : null;
+                minute = parts[3] ? parseInt(parts[3].split('').reverse().join(''), 10): null;
+                ampm = (!parts[1] || parts[1].toLowerCase() === 'a') ? 'am' : 'pm';
             }
           } 
 
