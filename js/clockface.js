@@ -128,7 +128,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         */
         keydown: function(e) {
           //tab, escape, enter --> hide
-          if(/(9|27|13)/.test(e.which)) {
+          if(/^(9|27|13)$/.test(e.which)) {
             this.hide();
             return;
           } 
