@@ -17,15 +17,26 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
     Clockface.prototype = {
         constructor: Clockface, 
         init: function () {
-          var that = this;
-
-          //iquery objects
+          //apply template
           this.$clockface = $($.fn.clockface.template);
-          this.$cells = this.$clockface.find('.cell'); 
-          this.$hour = this.$clockface.find('input[name="hour"]'); 
-          this.$minute = this.$clockface.find('input[name="minute"]'); 
+          this.$clockface.find('.l1 .cell, .left.cell').html('<div class="outer"></div><div class="inner"></div>'); 
+          this.$clockface.find('.l5 .cell, .right.cell').html('<div class="inner"></div><div class="outer"></div>'); 
+
+          this.$outer = this.$clockface.find('.outer');
+          this.$inner = this.$clockface.find('.inner');
           this.$ampm = this.$clockface.find('.ampm');
+
+          //internal vars
+          this.ampm = null;
+          this.hour = null;
+          this.minute = null;
           
+          //click am/pm 
+          this.$ampm.click($.proxy(this.clickAmPm, this));
+
+          //click cell
+          this.$clockface.on('click', '.cell', $.proxy(this.click, this));
+
           this.parseFormat();
 
           if(this.is24) {
@@ -33,25 +44,38 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
              this.options.pm = '0-11';
           } 
 
-          //click am/pm 
-          this.$ampm.click($.proxy(this.clickAmPm, this));
-
-          //click cell
-          this.$clockface.on('click', '.cell', $.proxy(this.clickCell, this));
-
-          //focus + keyup hour
-          this.$hour.focus($.proxy(this.focusHour, this))
-                    .keyup($.proxy(this.keyupHour, this));
-
-          //focus + keyup minute 
-          this.$minute.focus($.proxy(this.focusMinute, this))
-                      .keyup($.proxy(this.keyupMinute, this));
-
-
           this.isInline = this.$element.is('div');
          
+          //fill minutes once
+          this.fill('minute');
         },
 
+        /*
+        returns values of hours or minutes, depend on ampm and 24/12 format (0-11, 12-23, 00-55, etc)
+        param what: 'hour'/'minute'
+        */
+        getValues: function(what) {
+          var values = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5],
+              result = [];
+
+          if(what === 'minute') {
+              $.each(values, function(i, v) { result[i] = v*5; });
+          } else if(this.ampm === 'pm') {
+              if(this.is24) {
+                $.each(values, function(i, v) { result[i] = v+12; });
+              } else {
+                result = values.slice();
+                result[1] = 12; //need this to show '12' instead of '0' for 12h pm
+              }
+          } else {
+             result = values.slice();
+          }
+          return result;
+        },
+
+        /*
+        Displays widget with specified value
+        */
         show: function(value) {
             if(this.isInline) {
                 this.$element.empty().append(this.$clockface);
@@ -60,183 +84,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         },
 
         /*
-        render values around clockface and highlight.
-        Uses actual ampm and view param: hour / minute
-        and highlight value if possible
-        */
-        render: function(view) {
-          //make viewmode: hour-am, hour-pm, minute
-          var viewmode = view === 'hour' ? view + '-' + this.ampm : view,
-              values, index, value;
-
-          //fill values if needed
-          if(viewmode !== this.viewmode) {
-            this.viewmode = viewmode;
-            //get values to fill around clockface
-            values = this.getValues();
-            this.fill(values, viewmode === 'minute');
-          } 
-
-          //read value from input
-          value = this.viewmode === 'minute' ? this.$minute.val() : this.$hour.val();
-          value = parseInt(value, 10);
-
-          //clear current
-          this.$cells.filter('.active').removeClass('active');
-
-          //get values for highlight
-          values = values || this.getValues();
-
-          //find cell index and highlight
-          index = $.inArray(value, values);
-          if(index >= 0) {
-            this.$cells.eq(index).addClass('active');
-          }
-
-          //show (hide) ampm links for 24h 
-          if(this.is24) {
-            if(viewmode === 'minute') {
-               this.$ampm.hide();
-            } else {
-               this.$ampm.show();
-            }
-          }          
-        },
-
-        /*
-        returns values, depending on viewmode (0-11, 12-23, 00-55, etc)
-        */
-        getValues: function() {
-          var values = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5],
-              result = [];
-
-          switch(this.viewmode) {
-            case 'minute': 
-              $.each(values, function(i, v) { result[i] = v*5; });
-            break;
-            case 'hour-pm': 
-              if(this.is24) {
-                $.each(values, function(i, v) { result[i] = v+12; });
-              } else {
-                result = values.slice();
-                result[1] = 12; //need this to show '12' instead of '0' for pm
-              }
-            break;            
-            case 'hour-am': 
-              result = values;
-            break;            
-          }
-
-          return result;
-        },
-
-        /*
-        Just fill any values around clockface
-        */ 
-        fill: function(values, leadZero) {
-          this.$cells.each(function(i){
-            var v = values[i];
-            if(leadZero && v < 10) {
-              v = '0' + v;
-            }
-            $(this).text(v);
-          });
-        },
-
-        /*
-        Focus hour handler. Does not chnage ampm.
-        It just fills values and highlights hour
-        */
-        focusHour: function() {
-            this.render('hour');
-        },
-
-        /*
-        Keyup hour handler.
-        */
-        keyupHour: function() {
-          clearTimeout(this.timer);
-          this.timer = setTimeout($.proxy(function() {
-            this.setAmPmByHour();
-            this.render('hour');
-          }, this), 400);
-        }, 
-
-        /*
-        Set ampm by hiur value in the input sothat it will be 100% highlighted
-        May correct value in input (e.g. 23 --> 11 pm)
-        */
-        setAmPmByHour: function() {
-            value = parseInt(this.$hour.val(), 10);
-
-            //'24' always '0'
-            if(value === 24) {
-              value = 0;
-              this.$hour.val(value);
-            }
-
-            if(value > 11 && value < 24) {
-              this.setAmPm('pm');
-              //for 12h format correct value in input
-              if(!this.is24 && value > 12) {
-                this.$hour.val(value-12);
-              }
-            } else if(value >= 0 && value < 11) {
-              //always set am for 24h and for '0' in 12h 
-              if(this.is24 || value === 0) {
-                 this.setAmPm('am');
-              } 
-              //otherwise do nothing with ampm
-            }            
-        },        
-
-        /*
-        Click cell handler.
-        Writes new value and set focus. Focus will automatically highlight cell.
-        */
-        clickCell: function(e) {
-          if(this.viewmode === 'minute') {
-            this.$minute.val($(e.target).text()).focus();
-          } else {
-            this.$hour.val($(e.target).text()).focus();
-          } 
-        },
-
-        /*
-        Click handler on ampm links
-        Highlights ampm and set focus on input. Focus will automatically re-fill values if needed.
-        */
-        clickAmPm: function(e) {
-           e.preventDefault();
-           this.setAmPm(this.ampm === 'am' ? 'pm' : 'am');
-
-           if(this.viewmode === 'minute') {
-              this.$minute.focus(); 
-           } else {
-              this.$hour.focus();
-           }
-        },
-        
-        /*
-        Fous minute handler.
-        It just fills values and highlights minute
-        */
-        focusMinute: function() {
-            this.render('minute');
-        },
-
-        /*
-        Keyup minute handler.
-        */
-        keyupMinute: function() {
-          clearTimeout(this.timer);
-          this.timer = setTimeout($.proxy(function() {
-            this.render('minute');
-          }, this), 400);
-        }, 
-
-        /*
-        Highlight am / pm links
+        Set ampm and re-fill hours
         */
         setAmPm: function(value) {
           if(value === this.ampm) {
@@ -245,9 +93,87 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
              this.ampm = value;
           }
 
+          //set link's text
           this.$ampm.text(this.ampm === 'am' ? this.options.am : this.options.pm);
+
+          this.fill('hour');
+          this.highlight('hour');
+        },   
+        /*
+        Sets hour value and highlight if possible
+        */
+        setHour: function(value) {
+          this.hour = parseInt(value, 10);
+          this.highlight('hour');
         },
 
+        /*
+        Sets minute value and highlight
+        */
+        setMinute: function(value) {
+          this.minute = parseInt(value, 10);
+          this.highlight('minute');
+        },        
+
+        /*
+        Highlights hour/minute
+        */
+        highlight: function(what) {
+          var index,
+              values = this.getValues(what),
+              value = what === 'minute' ? this.minute : this.hour,
+              $cells = what === 'minute' ? this.$outer : this.$inner;
+
+          $cells.removeClass('active');
+
+          //find index of value and highlight if possible
+          index = $.inArray(value, values);
+          if(index >= 0) {
+            $cells.eq(index).addClass('active');
+          }
+        },
+
+        /*
+        Fill values around
+        */ 
+        fill: function(what) {
+          var values = this.getValues(what),
+              $cells = what === 'minute' ? this.$outer : this.$inner,
+              leadZero = what === 'minute';           
+
+          $cells.each(function(i){
+            var v = values[i];
+            if(leadZero && v < 10) {
+              v = '0' + v;
+            }
+            $(this).text(v);
+          });
+        },          
+
+        /*
+        Click cell handler.
+        Stores hour/minute and highlights.
+        On second click deselect value
+        */
+        click: function(e) {
+          var $target = $(e.target),
+              value = parseInt($target.text(), 10);
+          if($target.hasClass('inner')) {
+            this.setHour(value !== this.hour ? value : null);
+          } else {
+            this.setMinute(value !== this.minute ? value : null);
+          }
+        },
+
+        /*
+        Click handler on ampm link
+        */
+        clickAmPm: function(e) {
+           e.preventDefault();
+           //toggle am/pm
+           this.setAmPm(this.ampm === 'am' ? 'pm' : 'am');
+        },
+        
         /*
         Parse format from options and set this.is24
         */
@@ -285,7 +211,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         parseTime: function(value) {
           var d = new Date(),
               hour = d.getHours(), 
-              minute = '00', 
+              minute = 0, 
               ampm = 'am', 
               parts;
 
@@ -305,10 +231,6 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
             }
           } 
 
-          if(minute < 10) {
-            minute = '0' + minute;
-          } 
-
           return {hour: hour, minute: minute, ampm: ampm};
         },
 
@@ -316,8 +238,8 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         Returns time as string in specified format
         */
         getTime: function() {
-          var hour = parseInt(this.$hour.val(), 10),
-              minute = parseInt(this.$minute.val(), 10),
+          var hour = this.hour,
+              minute = this.minute,
               result = this.options.format;
 
           if(this.hFormat.length > 1 && hour < 10) {
@@ -341,24 +263,36 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         },
 
         /*
-        Set time of clockface.
+        Set time of clockface. Am/pm will be set automatically.
         Value can be Date object or string
         */
         setTime: function(value) {
-            //initial hour and minute
+            //parse value
             var res = this.parseTime(value);
 
-            this.$hour.val(res.hour);
-            this.$minute.val(res.minute);
-
-            //for 12h and hour <= 11 set ampm manually from value
-            if(!this.is24 && res.hour <= 11) {
-              this.setAmPm(res.ampm);
-            } else { //calc ampm automatically
-              this.setAmPmByHour();
+            //'24' always '0'
+            if(res.hour === 24) {
+              res.hour = 0;
             }
 
-            this.$hour.focus();
+            //try to set ampm automatically
+            if(res.hour > 11 && res.hour < 24) {
+              res.ampm = 'pm';
+              //for 12h format correct value 
+              if(!this.is24 && res.hour > 12) {
+                res.hour -= 12;
+              }
+            } else if(res.hour >= 0 && res.hour < 11) {
+              //always set am for 24h and for '0' in 12h 
+              if(this.is24 || res.hour === 0) {
+                 res.ampm = 'am';
+              } 
+              //otherwise ampm should be defined in value itself and stored in res when parsing
+            }      
+
+            this.setAmPm(res.ampm);
+            this.setHour(res.hour);
+            this.setMinute(res.minute);
         }
     };
 
@@ -396,19 +330,15 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           '<div class="l2">' +
                 '<div class="cell left"></div>' +
                 '<div class="cell right"></div>' +
-                // '<div class="center"><a href="#" class="am active">am</a><a href="#" class="pm">pm</a></div>' +
-                '<div class="center"><a href="#" class="ampm"></a></div>' +
           '</div>'+
           '<div class="l3">' +
                 '<div class="cell left"></div>' +
                 '<div class="cell right"></div>' +
-                '<div class="center"><input type="text" name="hour" maxlength="2"><span>:</span><input type="text" name="minute" maxlength="2"></div>' +
+                '<div class="center"><a href="#" class="ampm"></a></div>' +
           '</div>'+
           '<div class="l4">' +
                 '<div class="cell left"></div>' +
                 '<div class="cell right"></div>' +
-                // '<div class="center"><button class="btn btn-mini" type="button">ok</button></div>' +
-                '<div class="center"></div>' +
           '</div>'+
           '<div class="l5">' +
                 '<div class="cell"></div>' +

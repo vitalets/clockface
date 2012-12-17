@@ -2,8 +2,12 @@
 @import "bootstrap/variables.less";
 @import "bootstrap/mixins.less";
 
-@cellsize: 30px;
-@totalsize: 5*@cellsize;
+@cellsize: 20px;
+
+//delta between inner and outer
+@delta: 4px;
+
+@totalsize: 7*@cellsize + 2*@delta;
 
 
 
@@ -14,57 +18,108 @@
 	.border-radius(5px);
 	background-color: @wellBackground;
 	border: 1px solid darken(@wellBackground, 10%);   
-
-	text-align: center; 
-	line-height: @cellsize;	
+	
+    text-align: center; 
 
     >div {
     	clear: both;
     	overflow: auto;
     }
 
-	.cell {
-		width: @cellsize;
-		height: @cellsize;
-		cursor: default;
-		.border-radius(4px);
+    .outer, .inner {
+         width: @cellsize;
+         height: @cellsize;
+         line-height: @cellsize;  
+         cursor: default;
+         .border-radius(4px);
 
-		&.active,
-		&.active:hover {
-			.buttonBackground(@btnPrimaryBackground, spin(@btnPrimaryBackground, 20));
-			color: #fff;
-			text-shadow: 0 -1px 0 rgba(0,0,0,.25);
-		}	
 
-		&:hover {
-			background-color: darken(@wellBackground, 10%);  
-		}	
-	}
+        &.active,
+        &.active:hover {
+            color: #fff;
+            text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+        }   
+
+        &:hover {
+            background-color: darken(@wellBackground, 10%);  
+        }   
+    }    
+
+    .outer {
+        color: gray;
+        &.active,
+        &.active:hover {
+            .buttonBackground(@btnSuccessBackground, spin(@btnSuccessBackground, 20));
+        }        
+    }
+
+    .inner {
+        font-size: 0.8em;
+        &.active,
+        &.active:hover {
+            .buttonBackground(@btnPrimaryBackground, spin(@btnPrimaryBackground, 20));
+        }        
+    }
 
 	.l1, .l5 {
 		.cell {
+            width: @cellsize;
 			display: inline-block;
 			.ie7-inline-block();
 		}
 	}
 
+    .l1 .outer {
+        margin-bottom: @delta;  
+    }
+
+    .l5 .outer {
+        margin-top: @delta;  
+    }    
+
 	.l2, .l3, .l4 {
+        .outer, .inner {
+           display: inline-block;
+           .ie7-inline-block();  
+           vertical-align: middle;
+        }
+
 		.left {
 			float: left;
+            .outer {
+              margin-right: @delta;  
+            }
 		}
 
 		.right {
 			float: right;
+            .outer {
+              margin-left: @delta;  
+            }            
 		}
     }
 
+    .ampm {
+        font-size: 0.8em;
+        text-decoration: none;
+        border-bottom: dashed 1px;
+    }
+
+    .ampm:focus {
+        outline: 0;
+        outline: thin dotted \9; /* IE6-9 */ 
+    }
+
+    //need span to correctly show ':' in IE7
+    /*
     .l3 .center span {
     	vertical-align: middle;
 		display: inline-block;
 		.ie7-inline-block();  
 		padding: 0 2px;  	
     }
-
+    */
+/*
     input {
     	width: 20px;
     	margin: 0;
@@ -85,4 +140,5 @@
     		.buttonBackground(@btnSuccessBackground, spin(@btnSuccessBackground, 20));
     	}
     }
+    */
 }

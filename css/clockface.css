@@ -26,7 +26,7 @@
   box-sizing: border-box;
 }
 .clockface {
-  width: 150px;
+  width: 148px;
   padding: 3px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -34,109 +34,69 @@
   background-color: #f5f5f5;
   border: 1px solid #dcdcdc;
   text-align: center;
-  line-height: 30px;
+  /*
+    .l3 .center span {
+    	vertical-align: middle;
+		display: inline-block;
+		.ie7-inline-block();  
+		padding: 0 2px;  	
+    }
+    */
+
+  /*
+    input {
+    	width: 20px;
+    	margin: 0;
+    	vertical-align: top; 
+     }	
+
+    a {
+    	text-decoration: none;
+    	padding: 0 3px;
+    	vertical-align: top;
+    	font-size: 0.85em;
+    	.border-radius(3px);
+
+    	&.am {margin-right: 8px;}	
+    	
+    	&.active,
+    	&.active:hover {
+    		.buttonBackground(@btnSuccessBackground, spin(@btnSuccessBackground, 20));
+    	}
+    }
+    */
+
 }
 .clockface > div {
   clear: both;
   overflow: auto;
 }
-.clockface .cell {
-  width: 30px;
-  height: 30px;
+.clockface .outer,
+.clockface .inner {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
   cursor: default;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-.clockface .cell.active,
-.clockface .cell.active:hover {
-  color: #ffffff;
-  background-color: #006dcc;
-  background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
-  background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
-  background-image: -o-linear-gradient(top, #0088cc, #0044cc);
-  background-image: linear-gradient(to bottom, #0088cc, #0044cc);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
-  border-color: #0044cc #0044cc #002a80;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  *background-color: #0044cc;
-  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
-
-  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+.clockface .outer.active,
+.clockface .inner.active,
+.clockface .outer.active:hover,
+.clockface .inner.active:hover {
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
-.clockface .cell.active:hover,
-.clockface .cell.active:hover:hover,
-.clockface .cell.active:active,
-.clockface .cell.active:hover:active,
-.clockface .cell.active.active,
-.clockface .cell.active:hover.active,
-.clockface .cell.active.disabled,
-.clockface .cell.active:hover.disabled,
-.clockface .cell.active[disabled],
-.clockface .cell.active:hover[disabled] {
-  color: #ffffff;
-  background-color: #0044cc;
-  *background-color: #003bb3;
-}
-.clockface .cell.active:active,
-.clockface .cell.active:hover:active,
-.clockface .cell.active.active,
-.clockface .cell.active:hover.active {
-  background-color: #003399 \9;
-}
-.clockface .cell:hover {
+.clockface .outer:hover,
+.clockface .inner:hover {
   background-color: #dcdcdc;
 }
-.clockface .l1 .cell,
-.clockface .l5 .cell {
-  display: inline-block;
-  *display: inline;
-  /* IE7 inline-block hack */
-
-  *zoom: 1;
+.clockface .outer {
+  color: gray;
 }
-.clockface .l2 .left,
-.clockface .l3 .left,
-.clockface .l4 .left {
-  float: left;
-}
-.clockface .l2 .right,
-.clockface .l3 .right,
-.clockface .l4 .right {
-  float: right;
-}
-.clockface .l3 .center span {
-  vertical-align: middle;
-  display: inline-block;
-  *display: inline;
-  /* IE7 inline-block hack */
-
-  *zoom: 1;
-  padding: 0 2px;
-}
-.clockface input {
-  width: 20px;
-  margin: 0;
-  vertical-align: top;
-}
-.clockface a {
-  text-decoration: none;
-  padding: 0 3px;
-  vertical-align: top;
-  font-size: 0.85em;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-}
-.clockface a.am {
-  margin-right: 8px;
-}
-.clockface a.active,
-.clockface a.active:hover {
+.clockface .outer.active,
+.clockface .outer.active:hover {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #62c46f;
@@ -154,23 +114,123 @@
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
-.clockface a.active:hover,
-.clockface a.active:hover:hover,
-.clockface a.active:active,
-.clockface a.active:hover:active,
-.clockface a.active.active,
-.clockface a.active:hover.active,
-.clockface a.active.disabled,
-.clockface a.active:hover.disabled,
-.clockface a.active[disabled],
-.clockface a.active:hover[disabled] {
+.clockface .outer.active:hover,
+.clockface .outer.active:hover:hover,
+.clockface .outer.active:active,
+.clockface .outer.active:hover:active,
+.clockface .outer.active.active,
+.clockface .outer.active:hover.active,
+.clockface .outer.active.disabled,
+.clockface .outer.active:hover.disabled,
+.clockface .outer.active[disabled],
+.clockface .outer.active:hover[disabled] {
   color: #ffffff;
   background-color: #62c483;
   *background-color: #4fbd74;
 }
-.clockface a.active:active,
-.clockface a.active:hover:active,
-.clockface a.active.active,
-.clockface a.active:hover.active {
+.clockface .outer.active:active,
+.clockface .outer.active:hover:active,
+.clockface .outer.active.active,
+.clockface .outer.active:hover.active {
   background-color: #42b167 \9;
+}
+.clockface .inner {
+  font-size: 0.8em;
+}
+.clockface .inner.active,
+.clockface .inner.active:hover {
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #006dcc;
+  background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+  background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
+  background-image: -o-linear-gradient(top, #0088cc, #0044cc);
+  background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
+  border-color: #0044cc #0044cc #002a80;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  *background-color: #0044cc;
+  /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+}
+.clockface .inner.active:hover,
+.clockface .inner.active:hover:hover,
+.clockface .inner.active:active,
+.clockface .inner.active:hover:active,
+.clockface .inner.active.active,
+.clockface .inner.active:hover.active,
+.clockface .inner.active.disabled,
+.clockface .inner.active:hover.disabled,
+.clockface .inner.active[disabled],
+.clockface .inner.active:hover[disabled] {
+  color: #ffffff;
+  background-color: #0044cc;
+  *background-color: #003bb3;
+}
+.clockface .inner.active:active,
+.clockface .inner.active:hover:active,
+.clockface .inner.active.active,
+.clockface .inner.active:hover.active {
+  background-color: #003399 \9;
+}
+.clockface .l1 .cell,
+.clockface .l5 .cell {
+  width: 20px;
+  display: inline-block;
+  *display: inline;
+  /* IE7 inline-block hack */
+
+  *zoom: 1;
+}
+.clockface .l1 .outer {
+  margin-bottom: 4px;
+}
+.clockface .l5 .outer {
+  margin-top: 4px;
+}
+.clockface .l2 .outer,
+.clockface .l3 .outer,
+.clockface .l4 .outer,
+.clockface .l2 .inner,
+.clockface .l3 .inner,
+.clockface .l4 .inner {
+  display: inline-block;
+  *display: inline;
+  /* IE7 inline-block hack */
+
+  *zoom: 1;
+  vertical-align: middle;
+}
+.clockface .l2 .left,
+.clockface .l3 .left,
+.clockface .l4 .left {
+  float: left;
+}
+.clockface .l2 .left .outer,
+.clockface .l3 .left .outer,
+.clockface .l4 .left .outer {
+  margin-right: 4px;
+}
+.clockface .l2 .right,
+.clockface .l3 .right,
+.clockface .l4 .right {
+  float: right;
+}
+.clockface .l2 .right .outer,
+.clockface .l3 .right .outer,
+.clockface .l4 .right .outer {
+  margin-left: 4px;
+}
+.clockface .ampm {
+  font-size: 0.8em;
+  text-decoration: none;
+  border-bottom: dashed 1px;
+}
+.clockface .ampm:focus {
+  outline: 0;
+  outline: thin dotted \9;
+  /* IE6-9 */
 }
