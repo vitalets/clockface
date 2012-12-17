@@ -31,7 +31,6 @@
 
 		&.active,
 		&.active:hover {
-			.buttonBackground(@btnPrimaryBackground, spin(@btnPrimaryBackground, 20));
 			color: #fff;
 			text-shadow: 0 -1px 0 rgba(0,0,0,.25);
 		}	
@@ -40,6 +39,20 @@
 			background-color: darken(@wellBackground, 10%);  
 		}	
 	}
+
+    &.minute .cell {
+        &.active,
+        &.active:hover {
+            .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+        }    
+    }
+
+    &.hour .cell {
+        &.active,
+        &.active:hover {
+            .buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
+        }    
+    }    
 
 	.l1, .l5 {
 		.cell {

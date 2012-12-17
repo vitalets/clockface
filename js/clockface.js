@@ -72,6 +72,10 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           //fill values if needed
           if(viewmode !== this.viewmode) {
             this.viewmode = viewmode;
+
+            //set css class of view
+            this.$clockface.removeClass('hour minute').addClass(view);
+
             //get values to fill around clockface
             values = this.getValues();
             this.fill(values, viewmode === 'minute');
