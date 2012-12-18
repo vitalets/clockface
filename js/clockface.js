@@ -93,6 +93,9 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
                 $(window).on('resize.clockface', $.proxy(this.place, this));
             }
             this.setTime(value);
+
+            //trigger shown event
+            this.$element.triggerHandler('shown.clockface', this.getTime(true));
         },
         /*
         hides widget
@@ -104,6 +107,9 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
               this.$element.off('keydown.clockface');
               $(window).off('resize.clockface');
             }
+
+            //trigger hidden event
+            this.$element.triggerHandler('hidden.clockface', this.getTime(true));            
         },
 
         /*
@@ -304,6 +310,9 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           if(!this.isInline) {
             this.$element.val(this.getTime());
           }          
+
+          //trigger pick event
+          this.$element.triggerHandler('pick.clockface', this.getTime(true));  
         },
 
         /*
@@ -317,7 +326,10 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           //update value in input
           if(!this.isInline && !this.is24) {
             this.$element.val(this.getTime());
-          }           
+          }    
+
+          //trigger pick event
+          this.$element.triggerHandler('pick.clockface', this.getTime(true));                  
         },
         
 
@@ -348,7 +360,6 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
 
           clearTimeout(this.timer);
           this.timer = setTimeout($.proxy(function(){
-            console.log(e);
             this.setTime(this.$element.val());
           }, this), 500);
         },  
@@ -482,7 +493,15 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         /*
         Returns time as string in specified format
         */
-        getTime: function() {
+        getTime: function(asObject) {
+          if(asObject === true) {
+            return {
+              hour: this.hour,
+              minute: this.minute,
+              ampm: this.ampm
+            };
+          }
+
           var hour = this.hour !== null ? this.hour + '' : '',
               minute = this.minute !== null ? this.minute + '' : '',
               result = this.options.format;
@@ -515,6 +534,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
 
           return result;
         },
+
         /*
         Removes widget and detach events
         */
@@ -528,12 +548,12 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
     };
 
     $.fn.clockface = function ( option ) {
-        var args = Array.apply(null, arguments);
+        var d, args = Array.apply(null, arguments);
         args.shift();
 
         //getTime returns string (not jQuery onject)
-        if(option === 'getTime' && this.length && this.eq(0).data('clockface')) {
-          return this.eq(0).data('clockface').getTime();
+        if(option === 'getTime' && this.length && (d = this.eq(0).data('clockface'))) {
+          return d.getTime.apply(d, args);
         }
 
         return this.each(function () {

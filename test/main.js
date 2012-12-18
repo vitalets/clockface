@@ -180,7 +180,7 @@ test("click ampm", function () {
 });
 
 test("getTime", function () {
-  var  e, f;
+  var  e, f, t;
 
   f = 'H:mm';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01');
@@ -217,10 +217,59 @@ test("getTime", function () {
 
   f = 'h:mm a';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '6:71 pm');
-  equal(e.clockface('getTime'), '6 pm', f+'null minute ok');    
+  equal(e.clockface('getTime'), '6 pm', f+'null minute ok');   
+
+  //as object 
+  f = 'h:mm a';
+  e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '6:21 pm');
+  t = e.clockface('getTime', true);
+  equal(t.hour, 6, 'hour ok');   
+  equal(t.minute, 21, 'minute ok');   
+  equal(t.ampm, 'pm', 'hour ok');   
 });
 
 
+test("events: shown, pick, hide", function () {
+  expect(15);
 
+  var  e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'hh:mm'}),
+       o = e.data('clockface'),
+       hour = 10, minute = 0, ampm = 'am';
 
+  e.on('shown.clockface', function(e, data){
+      equal(data.hour, hour, 'hour ok');
+      equal(data.minute, minute, 'minute ok');
+      equal(data.ampm, ampm, 'ampm ok');
+  });
 
+  //triggerred 3 times: on pick hour, minute and ampm
+  e.on('pick.clockface', function(e, data){
+      equal(data.hour, hour, 'hour ok');
+      equal(data.minute, minute, 'minute ok');
+      equal(data.ampm, ampm, 'ampm ok');
+  });  
+
+  e.on('hidden.clockface', function(e, data){
+      equal(data.hour, hour, 'hour ok');
+      equal(data.minute, minute, 'minute ok');
+      equal(data.ampm, ampm, 'ampm ok');
+  });  
+
+  //should not be triggered as in another namespace
+  e.on('shown', function(){ ok(true, 'extra shown event triggered'); });
+  e.on('hidden', function(){ ok(true, 'extra hidden event triggered'); });
+  e.on('pick', function(){ ok(true, 'extra pick event triggered'); });  
+
+  e.clockface('show', '10:00');
+
+  hour = 11;
+  o.$inner.eq(0).click();
+
+  minute = 5;       
+  o.$outer.eq(2).click();
+
+  ampm = 'pm';
+  o.$ampm.click();
+
+  e.clockface('destroy');
+});
