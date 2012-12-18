@@ -8,7 +8,7 @@
 *
 * Author: Vitaliy Potapov
 * Project page: http://github.com/vitalets/clockface
-* Copyright (c) 2012 Vitaliy Potapov. Released under MIT License
+* Copyright (c) 2012 Vitaliy Potapov. Released under MIT License.
 **/
 (function ($) {
 
@@ -92,7 +92,6 @@
                 }
                 this.$element.addClass('clockface-open');
                 this.$element.on('keydown.clockface', $.proxy(this.keydown, this));
-                this.$clockface.show();
                 this.place();
                 $(window).on('resize.clockface', $.proxy(this.place, this));
             }

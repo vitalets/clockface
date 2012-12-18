@@ -14,8 +14,8 @@ fi
 
 if [ $(expr match $1 ".*dist.*") -gt 0 ] 
 then
-  rm -rf dist
-  mkdir dist
+  mkdir -p dist
+  rm -rf dist/**
   cp -R css dist/ 
   cp -R js dist/ 
   cp README.md CHANGELOG.txt LICENSE-MIT dist/ 
