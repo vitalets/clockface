@@ -30,7 +30,7 @@ test("trigger: manual", function () {
     format: 'H:mm',
     trigger: 'manual'
   }),
-  o = e.data('clockface');;
+  o = e.data('clockface');
   e.focus();
   ok(!$('.clockface:visible').length, 'not shown on focus');
 

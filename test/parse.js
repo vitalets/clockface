@@ -30,7 +30,7 @@ test("parse value from string", function () {
           }
 
           //12h pm
-          for(var a=0; a<pm.length; a++) {
+          for(a=0; a<pm.length; a++) {
             str = base + pm[a];
             ok(true, str);
             e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'h'+sep[s]+'mm a'}).clockface('show', str);

@@ -339,7 +339,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         place: function(){
           var zIndex = parseInt(this.$element.parents().filter(function() {
                    return $(this).css('z-index') != 'auto';
-             }).first().css('z-index'))+10,
+             }).first().css('z-index'), 10)+10,
              offset = this.$element.offset();
           this.$clockface.css({
             top: offset.top + this.$element.outerHeight(),

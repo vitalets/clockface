@@ -5,6 +5,13 @@ then
   echo css ok
 fi
 
+if [ $(expr match $1 ".*jshint.*") -gt 0 ] 
+then
+  jshint js/ test/  
+  echo jshint finish
+fi
+
+
 if [ $(expr match $1 ".*dist.*") -gt 0 ] 
 then
   rm -rf dist
