@@ -41,10 +41,8 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           this.parseFormat();
           this.prepareRegexp();
 
-          if(this.is24) {
-             this.options.am = '12-23';
-             this.options.pm = '0-11';
-          } 
+          //set ampm text
+          this.ampmtext = this.is24 ? {am: '12-23', pm: '0-11'} : {am: 'AM', pm: 'PM'};
 
           this.isInline = this.$element.is('div');
           if(this.isInline) {
@@ -92,12 +90,6 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
                 $(window).on('resize.clockface', $.proxy(this.place, this));
             }
             this.setTime(value);
-
-            //replace value of element on more correct
-            var time = this.getTime();
-            if(!this.isInline && time !== this.$element.val()) {
-              this.$element.val(time);
-            }
         },
 
         hide: function() {
@@ -151,8 +143,9 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           }
 
           //set link's text
-          this.$ampm.text(this.ampm === 'am' ? this.options.am : this.options.pm);
+          this.$ampm.text(this.ampmtext[this.ampm]);
 
+          //re-fill and highlight hour
           this.fill('hour');
           this.highlight('hour');
           if(!this.isInline && !this.is24) {
@@ -508,8 +501,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
     $.fn.clockface.defaults = {
         //see http://momentjs.com/docs/#/displaying/format/
         format: 'H:mm',
-        am: 'AM',
-        pm: 'PM'
+        trigger: 'focus' //focus|manual
     };
    
 

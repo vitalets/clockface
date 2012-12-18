@@ -43,7 +43,7 @@ test("set value from Date object", function () {
 
   equal(parseInt(o.$inner.filter('.active').text(), 10), o.hour, 'display hour ok');
   equal(parseInt(o.$outer.filter('.active').text(), 10), o.minute, 'display minute ok');
-  equal(o.$ampm.text(), o.options.am, 'display ampm ok');
+  equal(o.$ampm.text(), 'AM', 'display ampm ok');
 
   //12h pm 
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'h:mm a'}).clockface('show', d_pm);
@@ -53,7 +53,7 @@ test("set value from Date object", function () {
   equal(o.ampm, 'pm', 'ampm ok');
   equal(parseInt(o.$inner.filter('.active').text(), 10), o.hour, 'display hour ok');
   equal(parseInt(o.$outer.filter('.active').text(), 10), o.minute, 'display minute ok');
-  equal(o.$ampm.text(), o.options.pm, 'display ampm ok'); 
+  equal(o.$ampm.text(), 'PM', 'display ampm ok'); 
 
   //24h am 
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'H:mm'}).clockface('show', d_am);
@@ -63,7 +63,7 @@ test("set value from Date object", function () {
   equal(o.ampm, 'am', 'ampm ok');
   equal(parseInt(o.$inner.filter('.active').text(), 10), o.hour, 'display hour ok');
   equal(parseInt(o.$outer.filter('.active').text(), 10), o.minute, 'display minute ok');
-  equal(o.$ampm.text(), o.options.am, 'display ampm ok');
+  equal(o.$ampm.text(), '12-23', 'display ampm ok');
 
   //24h pm 
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: 'H:mm'}).clockface('show', d_pm);
@@ -73,7 +73,7 @@ test("set value from Date object", function () {
   equal(o.ampm, 'pm', 'ampm ok');
   equal(parseInt(o.$inner.filter('.active').text(), 10), o.hour, 'display hour ok');
   equal(parseInt(o.$outer.filter('.active').text(), 10), o.minute, 'display minute ok');
-  equal(o.$ampm.text(), o.options.pm, 'display ampm ok');  
+  equal(o.$ampm.text(), '0-11', 'display ampm ok');  
 }); 
 
 test("incorrect input value", function () { 
@@ -143,11 +143,11 @@ test("click ampm", function () {
   o = e.data('clockface');
   ok(o.$inner.eq(2).hasClass('active'), 'hour cell selected');
   equal(o.$inner.eq(1).text(), '12', '12 shown at 0');
-  equal(o.$ampm.text(), o.options.pm, 'ampm text ok');
+  equal(o.$ampm.text(), 'PM', 'ampm text ok');
   o.$ampm.click();     
   ok(o.$inner.eq(2).hasClass('active'), 'hour selected in am');
   equal(o.$inner.eq(1).text(), '0', '0 shown at 0');
-  equal(o.$ampm.text(), o.options.am, 'ampm text ok');
+  equal(o.$ampm.text(), 'AM', 'ampm text ok');
   o.$ampm.click();     
   ok(o.$inner.eq(2).hasClass('active'), 'hour selected in pm');  
 });
