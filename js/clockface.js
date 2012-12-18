@@ -49,11 +49,9 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
             this.$clockface.addClass('clockface-inline').appendTo(this.$element);
           } else {
             this.$clockface.addClass('dropdown-menu').appendTo('body');
-            this.$element.on({
-              'focus.clockface': $.proxy(function(e) {
-                 this.show();
-              }, this)
-            });
+            if(this.options.trigger === 'focus') {
+              this.$element.on('focus.clockface', $.proxy(function(e) { this.show(); }, this));
+            }
 
             // Click outside hide it
             $(document).on('click', $.proxy(function (e) {
@@ -82,9 +80,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
                 if(value === undefined) {
                   value = this.$element.val();
                 }
-                this.$element.on({
-                  'keydown.clockface': $.proxy(this.keydown, this)
-                });
+                this.$element.on('keydown.clockface', $.proxy(this.keydown, this));
                 this.$clockface.show();
                 this.place();
                 $(window).on('resize.clockface', $.proxy(this.place, this));
@@ -95,8 +91,8 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         hide: function() {
             this.$clockface.hide();
             if(!this.isInline) {
-                this.$element.off('keydown.clockface');
-                $(window).off('resize.clockface');
+              this.$element.off('keydown.clockface');
+              $(window).off('resize.clockface');
             }
         },
 
