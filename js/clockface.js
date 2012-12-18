@@ -14,7 +14,7 @@
 
     var Clockface = function (element, options) {
         this.$element = $(element);
-        this.options = $.extend({}, $.fn.clockface.defaults, options);
+        this.options = $.extend({}, $.fn.clockface.defaults, options, this.$element.data());
         this.init();  
      };
 
@@ -52,7 +52,7 @@
           if(this.isInline) {
             this.$clockface.addClass('clockface-inline').appendTo(this.$element);
           } else {
-            this.$clockface.addClass('dropdown-menu').prependTo('body');
+            this.$clockface.addClass('dropdown-menu').appendTo('body');
             if(this.options.trigger === 'focus') {
               this.$element.on('focus.clockface', $.proxy(function(e) { this.show(); }, this));
             }

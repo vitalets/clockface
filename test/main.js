@@ -21,7 +21,12 @@ test("should expose defaults var for settings", function () {
 test("should store instance in data object", function () {
   var e = $('<div></div>').clockface();
   ok(!!e.data('clockface'), 'instance exists in data');
-});      
+});    
+
+test("options via data-* attribute", function () {
+  var e = $('<div data-format="hh:mm"></div>').clockface();
+  equal(e.data('clockface').options.format, 'hh:mm', 'format taken from data-* attribute');
+});   
 
 test("show/hide/destroy methods (inline)", function () {
   var e = $('<div></div>').appendTo('#qunit-fixture').clockface(),
