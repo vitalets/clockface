@@ -1,0 +1,7 @@
+#read version from input
+version=$1
+
+#bump version in files
+sed -i "s/\* Clockface - v[0-9]\+\.[0-9]\+\.[0-9]\+/* Clockface - v$version/g" js/clockface.js
+
+echo "bumped $version"

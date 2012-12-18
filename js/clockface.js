@@ -1,10 +1,14 @@
 /**
-Clockface timepicker
-
-Confusion with noon and midnight: 
-http://en.wikipedia.org/wiki/12-hour_clock
-In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
-
+* Clockface - v1.0.0
+* Clockface timepicker for Twitter Bootstrap
+*
+* Confusion with noon and midnight: 
+* http://en.wikipedia.org/wiki/12-hour_clock
+* Here considered '00:00 am' as midnight and '12:00 pm' as noon.
+*
+* Author: Vitaliy Potapov
+* Project page: http://github.com/vitalets/clockface
+* Copyright (c) 2012 Vitaliy Potapov. Released under MIT License
 **/
 (function ($) {
 
