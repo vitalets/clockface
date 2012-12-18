@@ -52,7 +52,7 @@
           if(this.isInline) {
             this.$clockface.addClass('clockface-inline').appendTo(this.$element);
           } else {
-            this.$clockface.addClass('dropdown-menu').appendTo('body');
+            this.$clockface.addClass('dropdown-menu').prependTo('body');
             if(this.options.trigger === 'focus') {
               this.$element.on('focus.clockface', $.proxy(function(e) { this.show(); }, this));
             }
@@ -85,7 +85,6 @@
             if(this.$clockface.is(':visible')) {
               return;
             }
-            this.$clockface.show();
             if(!this.isInline) {
                 if(value === undefined) {
                   value = this.$element.val();
@@ -95,6 +94,7 @@
                 this.place();
                 $(window).on('resize.clockface', $.proxy(this.place, this));
             }
+            this.$clockface.show();
             this.setTime(value);
 
             //trigger shown event
