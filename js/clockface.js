@@ -94,7 +94,9 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
             }
             this.setTime(value);
         },
-
+        /*
+        hides widget
+        */
         hide: function() {
             this.$clockface.hide();
             if(!this.isInline) {
@@ -102,6 +104,17 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
               this.$element.off('keydown.clockface');
               $(window).off('resize.clockface');
             }
+        },
+
+        /*
+        toggles show/hide
+        */
+        toggle: function(value) {
+          if(this.$clockface.is(':visible')) {
+            this.hide();
+          } else {
+            this.show(value);
+          }
         },
 
          /*

@@ -38,6 +38,21 @@ test("trigger: manual", function () {
   ok(!$('.clockface').length, 'destroyed');
 });
 
+test("toggle", function () {
+  var e = $('<input value="23:30">').appendTo('#qunit-fixture').clockface({
+    format: 'H:mm'
+  }),
+  o = e.data('clockface');
+  e.clockface('toggle');
+  ok($('.clockface:visible').length, 'shown on toggle');
+  
+  e.clockface('toggle');
+  ok(!$('.clockface:visible').length, 'closed on toggle');
+
+  e.clockface('destroy');
+  ok(!$('.clockface').length, 'destroyed');
+});
+
 test("click outside close widget", function () {
   var e = $('<input value="23:30">').appendTo('#qunit-fixture').clockface({
     format: 'H:mm'
