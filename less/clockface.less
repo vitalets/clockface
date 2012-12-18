@@ -2,9 +2,9 @@
 @import "bootstrap/variables.less";
 @import "bootstrap/mixins.less";
 
-@cellsize: 20px;
+@cellsize: 22px;
 //delta between inner and outer
-@delta: 4px;
+@delta: 3px;
 @totalsize: 7*@cellsize + 2*@delta;
 
 
@@ -40,6 +40,7 @@
 
     .outer {
         color: gray;
+        font-size: 0.8em;
         &.active,
         &.active:hover {
             .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
@@ -47,7 +48,7 @@
     }
 
     .inner {
-        font-size: 0.8em;
+        //font-size: 0.8em;
         &.active,
         &.active:hover {
             .buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);

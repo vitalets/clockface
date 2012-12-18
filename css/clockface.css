@@ -26,7 +26,7 @@
   box-sizing: border-box;
 }
 .clockface {
-  width: 148px;
+  width: 160px;
   padding: 3px;
   text-align: center;
   /*
@@ -68,9 +68,9 @@
 }
 .clockface .outer,
 .clockface .inner {
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
   cursor: default;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -89,6 +89,7 @@
 }
 .clockface .outer {
   color: gray;
+  font-size: 0.8em;
 }
 .clockface .outer.active,
 .clockface .outer.active:hover {
@@ -128,9 +129,6 @@
 .clockface .outer.active.active,
 .clockface .outer.active:hover.active {
   background-color: #408140 \9;
-}
-.clockface .inner {
-  font-size: 0.8em;
 }
 .clockface .inner.active,
 .clockface .inner.active:hover {
@@ -173,7 +171,7 @@
 }
 .clockface .l1 .cell,
 .clockface .l5 .cell {
-  width: 20px;
+  width: 22px;
   display: inline-block;
   *display: inline;
   /* IE7 inline-block hack */
@@ -181,10 +179,10 @@
   *zoom: 1;
 }
 .clockface .l1 .outer {
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 .clockface .l5 .outer {
-  margin-top: 4px;
+  margin-top: 3px;
 }
 .clockface .l2 .outer,
 .clockface .l3 .outer,
@@ -207,7 +205,7 @@
 .clockface .l2 .left .outer,
 .clockface .l3 .left .outer,
 .clockface .l4 .left .outer {
-  margin-right: 4px;
+  margin-right: 3px;
 }
 .clockface .l2 .right,
 .clockface .l3 .right,
@@ -217,7 +215,7 @@
 .clockface .l2 .right .outer,
 .clockface .l3 .right .outer,
 .clockface .l4 .right .outer {
-  margin-left: 4px;
+  margin-left: 3px;
 }
 .clockface .ampm {
   font-size: 0.8em;
