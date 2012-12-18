@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Clockface timepicker for Twitter Bootstrap</title>
+        <!-- jquery -->
+        <script src="jquery/jquery-1.8.2.min.js"></script>
+
+        <!-- bootstrap -->
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+        <!-- <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">   -->
+        <script src="bootstrap/js/bootstrap.js"></script>
+
+        <!-- prettify -->  
+        <link rel="stylesheet" href="prettify/prettify-bootstrap.css">    
+        <script src="prettify/prettify.js"></script> 
+
+        <!-- clockface -->  
+        <link rel="stylesheet" href="clockface/css/clockface.css">    
+        <script src="clockface/js/clockface.js"></script> 
+
+        <style type="text/css">
+            body {
+                padding-top: 50px;
+                padding-bottom: 30px;
+            }
+
+            .popover {
+                width: auto !important;
+            }
+        </style>  
+    </head>
+    <body>
+
+       <!-- nav bar --> 
+       <div class="navbar navbar-inverse navbar-fixed-top">
+          <div class="navbar-inner">
+            <div class="container">
+                <a href="index.html" class="brand">Clockface</a>
+                <ul class="nav">
+                    <li class="active"><a href="index.html">Demo &amp; docs</a></li>
+                    <li><a target="_blank" href="http://vitalets.github.com/clockface">GitHub</a></li>
+                </ul>
+
+                <div style="padding-top: 10px;" class="pull-right">
+                    <!-- twitter -->
+                    <div class="pull-right" style="width: 320px;">
+                        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://vitalets.github.com/clockface" data-via="vitpotapov">Tweet</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>            
+                    </div>
+
+                    <!-- facebook -->
+                    <div class="pull-right" style="width: 90px">
+                        <div id="fb-root"></div>
+                        <script>(function(d, s, id) {
+                          var js, fjs = d.getElementsByTagName(s)[0];
+                          if (d.getElementById(id)) return;
+                          js = d.createElement(s); js.id = id;
+                          js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+                          fjs.parentNode.insertBefore(js, fjs);
+                      }(document, 'script', 'facebook-jssdk'));</script>
+                      <div style="vertical-align:top;zoom:1;*display:inline" class="fb-like" data-href="http://vitalets.github.com/clockface" data-send="false" data-layout="button_count" data-width1="450" data-show-faces="false"></div>
+                  </div>
+
+                  <!-- google+ -->
+                  <div class="pull-right" style="width: 80px">
+                    <div class="g-plusone" data-size="medium" data-href="http://vitalets.github.com/clockface"></div>
+                    <script type="text/javascript">
+                    (function() {
+                        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+                        po.src = 'https://apis.google.com/js/plusone.js';
+                        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+                    })();
+                    </script>
+                   </div>   
+                </div>
+
+             </div>  
+          </div>
+        </div> 
+
+
+    <div class="container">
+        
+        <div class="page-header">
+            <a href="zip/clockface-1.0.1.zip" class="btn btn-primary pull-right" style="margin-top: 10px"><strong>Download</strong> (1.0.1)</a>
+            <h1>Clockface <small>timepicker for Twitter Bootstrap</small></h1>
+        </div>
+
+        <div class="row">
+            <div class="span4">
+                <h3>Input</h3>
+                <p>Attached to <code>input</code> element:</p>
+                <p><input type="text" id="t1" value="2:30 PM" data-format="hh:mm A" class="input-small"></p>
+                <p><a href="#" class="source" data-placement="right" title="Clockface Input" data-id="t1">Source</a></p>
+            </div>
+            <div class="span4">
+                <h3>Component</h3>
+                <p>Attached to readonly <code>input</code> with appended button:</p>
+<div><div class="input-append">
+    <input type="text" id="t2" value="14:30" class="input-small" readonly>
+    <button class="btn" type="button" id="toggle-btn">
+        <i class="icon-time"></i>
+    </button>
+</div></div>
+                <p style="margin-top:20px"><a href="#" class="source" data-placement="bottom" title="Clockface Component" data-id="t2">Source</a></p>
+            </div>
+            <div class="span4">
+                <h3>Inline</h3>
+                <p>Attached to <code>div</code> element:</p>
+                <div><div id="t3" class="well" style="padding: 0; float: left"></div></div>
+                <p style="clear:both"><a href="#" class="source" data-placement="left" title="Clockface Inline" data-id="t3">Source</a></p>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="span4">
+                <h3 class="muted">Options</h3>
+
+                <h4>format</h4>
+                <p>String. Default: <code>H:mm</code></p>
+                <p>
+                    Time format. Possible tokens are: <code>H</code>,<code>h</code>,<code>m</code>,<code>a</code>.<br>
+                    If set <code>H</code> or <code>HH</code> - it's <strong>24h</strong> format, central link works as 0-11 / 12-23 toggle.<br>
+                    If set <code>h</code> or <code>hh</code> - it's <strong>12h</strong> format, central link works as AM / PM toggle.
+                </p>
+
+                <br>
+                <h4>trigger</h4>
+                <p>String. Default: <code>focus</code></p>
+                <p>
+                    How to trigger clockface.<br> Possible values: <code>focus|manual</code>.<br>
+                    If set <code>focus</code> it's applied only when attached to <code>input</code>.
+                </p>
+
+            </div>
+            <div class="span4">
+                <h3 class="muted">Methods</h3>
+
+                <h4>.clockface(options)</h4>
+                <p>Initializes widget.</p>
+                <pre class="prettyprint">$('#time').clockface({format: 'HH:mm'});</pre>
+
+                <h4>show</h4>
+                <p>Arguments:</p>
+                <ul>
+                    <li>time (string|object) [optional]</li>
+                </ul>        
+                <p>Shows widget.</p>
+                <pre class="prettyprint">$('#time').clockface('show', '12:30');</pre>
+
+                <h4>hide</h4>
+                <p>Hides widget.</p>
+                <pre class="prettyprint">$('#time').clockface('hide');</pre>
+
+                <h4>toggle</h4>
+                <p>Arguments:</p>
+                <ul>
+                    <li>time (string|object) [optional]</li>
+                </ul>                 
+                <p>Toggles show/hide.</p> 
+                <pre class="prettyprint">$('#time').clockface('toggle');</pre>
+
+                <h4>setTime</h4>
+                <p>Arguments:</p>
+                <ul>
+                    <li>time (string|object)</li>
+                </ul>                 
+                <p>Sets time of widget.</p> 
+                <pre class="prettyprint">$('#time').clockface('setTime', '2:30');</pre>
+
+                <h4>getTime</h4>
+                <p>Arguments:</p>
+                <ul>
+                    <li>asObject (boolean). Default: false</li>
+                </ul>                 
+                <p>Returns time in specified format. If asObject = true returns object containing <code>hour</code>, 
+                    <code>minute</code> and <code>ampm</code> values.</p> 
+                <pre class="prettyprint">var s = $('#time').clockface('getTime');</pre>                
+            </div>
+            <div class="span4">
+                <h3 class="muted">Events</h3>
+                <h4>shown.clockface</h4>
+                <p>Fires when widget was shown.</p>
+<pre class="prettyprint">$('#time').on('shown.clockface', 
+function(e, data) {
+  alert(data.hour);
+});</pre>    
+
+                <p>All events have second parameter <strong>data</strong> with current <code>hour</code>, 
+                    <code>minute</code> and <code>ampm</code> values.</p>
+
+                <br>   
+                <h4>hidden.clockface</h4>
+                <p>Fires when widget was hidden.</p>
+
+                <br>
+                <h4>pick.clockface</h4>
+                <p>Fires every time when user picks hour, minute or am/pm.</p>                
+            </div>
+        </div>        
+
+        <hr>
+
+        <footer class="footer">
+           
+            <p>&copy; <a href="http://github.com/vitalets">Vitaliy Potapov</a> 2012. Released under the MIT license.</p> 
+        </footer>
+    </div> <!--/container-->
+        
+
+
+
+
+    <div id="sources" class="hide">  
+       <div id="src-tpl">
+           <p>markup:</p> 
+           <pre class="prettyprint linenums"></pre>  
+           <p>js:</p> 
+           <pre class="prettyprint linenums"></pre>  
+       </div> 
+
+   </div>   
+
+        <!-- main js -->
+
+ <script>
+             $(function(){
+                 //render sources in hidden div
+                 $.each(['t1', 't2', 't3'], function(i, v){
+                    var t = $('#src-tpl').clone().attr('id', 'src-'+v).appendTo('#sources');
+                    t.find('pre').eq(0).text($.trim(v === 't2' ? $('#'+v).parent().parent().html() : $('#'+v).parent().html()));
+                    t.find('pre').eq(1).text($.trim($('#js-'+v).text()));
+                 });
+             });
+</script>                 
+
+<script id="js-t1">
+$(function(){
+    $('#t1').clockface();  
+});
+</script>
+
+<script id="js-t2">
+$(function(){
+    $('#t2').clockface({
+        format: 'HH:mm',
+        trigger: 'manual'
+    });   
+
+    $('#toggle-btn').click(function(e){   
+        e.stopPropagation();
+        $('#t2').clockface('toggle');
+    });
+});
+</script>
+
+<script id="js-t3">
+$(function(){
+    $('#t3').clockface({
+        format: 'H:mm'
+    }).clockface('show', '14:30'); 
+});
+</script>
+
+       <script>
+             $(function(){
+                 //render sources in hidden div
+                 $.each(['t1', 't2', 't3'], function(i, v){
+                    var t = $('#src-tpl').clone().attr('id', 'src-'+v).appendTo('#sources');
+                    t.find('pre').eq(0).text($.trim(v === 't2' ? $('#'+v).parent().parent().html() : $('#'+v).parent().html()));
+                    t.find('pre').eq(1).text($.trim($('#js-'+v).text()));
+                 });
+                 
+
+                 //source click
+                 $('a.source').popover({
+                    html: true,
+                    content: function() {
+                        return $('#src-'+$(this).data('id')).clone();
+                    }
+                 });  
+
+                 //hide popovers on document click
+                 $(document).on('click', function(e){
+                    if($(e.target).closest('.popover').length || $(e.target).hasClass('source')) {
+                        return;
+                    }
+                    $('a.source').popover('hide');
+                 });  
+
+                 prettyPrint();            
+             });
+        </script>
+
+
+        <!-- Yandex.Metrika counter -->
+        <script type="text/javascript">
+        (function (d, w, c) {
+            (w[c] = w[c] || []).push(function() {
+                try {
+                    w.yaCounter18329314 = new Ya.Metrika({id:18329314,
+                            clickmap:true,
+                            trackLinks:true,
+                            accurateTrackBounce:true});
+                } catch(e) { }
+            });
+
+            var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+            if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f);
+            } else { f(); }
+        })(document, window, "yandex_metrika_callbacks");
+        </script>
+        <noscript><div><img src="//mc.yandex.ru/watch/18329314" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+        <!-- /Yandex.Metrika counter -->
+        
+    </body>
+</html>

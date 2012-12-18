@@ -1,0 +1,22 @@
+echo don't forget to run 'build dist' before!
+
+#copy dist
+mkdir -p clockface
+rm -rf clockface/**
+cp -R ../lib/dist/** clockface/
+
+#extract version
+version=$(head -2 clockface/js/clockface.js | sed -n 's/^.*\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p') 
+echo version: $version
+
+#replace version in link zip
+sed -i "s/clockface\-[0-9]\+\.[0-9]\+\.[0-9]\+\.zip/clockface-$version.zip/g" index.html
+
+#replace version in link text
+sed -i "s/strong> ([0-9]\+\.[0-9]\+\.[0-9]\+)/strong> ($version)/g" index.html
+
+#zip
+cd clockface
+rm -f ../zip/clockface-$version.zip
+zip -rT ../zip/clockface-$version.zip **
+
