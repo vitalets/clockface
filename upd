@@ -1,4 +1,4 @@
-echo don't forget to run 'build dist' before!
+echo dont forget to run in lib: build dist 
 
 #copy dist
 mkdir -p clockface

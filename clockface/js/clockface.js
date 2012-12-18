@@ -1,5 +1,5 @@
 /**
-* Clockface - v1.0.1
+* Clockface - v1.0.0
 * Clockface timepicker for Twitter Bootstrap
 *
 * Confusion with noon and midnight: 
