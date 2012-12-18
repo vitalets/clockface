@@ -1,0 +1,23 @@
+if [ $(expr match $1 ".*css.*") -gt 0 ] 
+then
+  rm -rf css/**
+  lessc less/clockface.less > css/clockface.css
+  echo css ok
+fi
+
+if [ $(expr match $1 ".*jshint.*") -gt 0 ] || [ $(expr match $1 ".*dist.*") -gt 0 ]  
+then
+  jshint js/ test/  
+  echo jshint finish
+fi
+
+
+if [ $(expr match $1 ".*dist.*") -gt 0 ] 
+then
+  mkdir -p dist
+  rm -rf dist/**
+  cp -R css dist/ 
+  cp -R js dist/ 
+  cp README.md CHANGELOG.txt LICENSE-MIT dist/ 
+  echo dist ok
+fi

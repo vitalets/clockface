@@ -1,11 +1,12 @@
-# Watch 
-This plugin is timepicker using watch-like interface.
+# Clockface 
+Clock-like timepicker for Twitter Bootstrap.
 
-## Demo & Download
-See **http://vitalets.github.com/watch**
+## Demo, Docs and Download
+See **http://vitalets.github.com/clockface**
 
 ## Contribution
-Your support is very appreciated! Please make pull requests on <code>dev</code> branch. Thank you!
+Your support is appreciated. 
+Please make pull requests on <code>dev</code> branch. Thank you!
 
 ## License
 Copyright (c) 2012 Vitaliy Potapov  
