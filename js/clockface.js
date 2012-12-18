@@ -53,16 +53,22 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
               this.$element.on('focus.clockface', $.proxy(function(e) { this.show(); }, this));
             }
 
-            // Click outside hide it
-            $(document).on('click', $.proxy(function (e) {
-                if ($(e.target).closest('.clockface').length || $(e.target)[0] === this.$element[0]) {
+            // Click outside hide it. Register single handler for all clockface widgets
+            $(document).off('click.clockface').on('click.clockface', $.proxy(function (e) {
+                var $target = $(e.target);
+                //click inside some clockface --> do nothing
+                if ($target.closest('.clockface').length) {
                   return;
                 }
-                this.hide();
+                //iterate all open clockface and close all except current
+                $('.clockface-open').each(function(){
+                  if(this === e.target) {
+                    return;
+                  }
+                  $(this).clockface('hide');
+                });
             }, this));
           }
-         
-
 
           //fill minutes once
           this.fill('minute');
@@ -80,6 +86,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
                 if(value === undefined) {
                   value = this.$element.val();
                 }
+                this.$element.addClass('clockface-open');
                 this.$element.on('keydown.clockface', $.proxy(this.keydown, this));
                 this.$clockface.show();
                 this.place();
@@ -91,6 +98,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         hide: function() {
             this.$clockface.hide();
             if(!this.isInline) {
+              this.$element.removeClass('clockface-open');  
               this.$element.off('keydown.clockface');
               $(window).off('resize.clockface');
             }
@@ -144,9 +152,6 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           //re-fill and highlight hour
           this.fill('hour');
           this.highlight('hour');
-          if(!this.isInline && !this.is24) {
-            this.$element.val(this.getTime());
-          }
         },   
         /*
         Sets hour value and highlight if possible
@@ -257,7 +262,8 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           } else {
             this.setMinute(value);
           }
-
+          
+          //update value in input
           if(!this.isInline) {
             this.$element.val(this.getTime());
           }          
@@ -267,9 +273,14 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
         Click handler on ampm link
         */
         clickAmPm: function(e) {
-           e.preventDefault();
-           //toggle am/pm
-           this.setAmPm(this.ampm === 'am' ? 'pm' : 'am');
+          e.preventDefault();
+          //toggle am/pm
+          this.setAmPm(this.ampm === 'am' ? 'pm' : 'am');
+
+          //update value in input
+          if(!this.isInline && !this.is24) {
+            this.$element.val(this.getTime());
+          }           
         },
         
         /*
@@ -473,9 +484,17 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           }
 
           return result;
+        },
+        /*
+        Removes widget and detach events
+        */
+        destroy: function() {
+          this.hide();
+          this.$clockface.remove();
+          if(!this.isInline && this.options.trigger === 'focus') {
+            this.$element.off('focus.clockface');
+          }          
         }
-
-
     };
 
     $.fn.clockface = function ( option ) {

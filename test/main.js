@@ -23,10 +23,14 @@ test("should store instance in data object", function () {
   ok(!!e.data('clockface'), 'instance exists in data');
 });      
 
-test("show method (inline)", function () {
+test("show/hide/destroy methods (inline)", function () {
   var e = $('<div></div>').appendTo('#qunit-fixture').clockface();
   e.clockface('show');
   ok(e.find('.clockface:visible').length, 'shown');
+  e.clockface('hide');
+  ok(!e.find('.clockface:visible').length, 'hidden');
+  e.clockface('destroy');
+  ok(!e.find('.clockface').length, 'destroyed completely');
 });  
 
 test("set value from Date object", function () {
