@@ -530,6 +530,12 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
     $.fn.clockface = function ( option ) {
         var args = Array.apply(null, arguments);
         args.shift();
+
+        //getTime returns string (not jQuery onject)
+        if(option === 'getTime' && this.length && this.eq(0).data('clockface')) {
+          return this.eq(0).data('clockface').getTime();
+        }
+
         return this.each(function () {
             var $this = $(this),
             data = $this.data('clockface'),

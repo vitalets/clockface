@@ -184,40 +184,40 @@ test("getTime", function () {
 
   f = 'H:mm';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01');
-  equal(e.data('clockface').getTime(), '1:01', f+' ok');
+  equal(e.clockface('getTime'), '1:01', f+' ok');
 
   f = 'HH:mm';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01');
-  equal(e.data('clockface').getTime(), '01:01', f+' ok');
+  equal(e.clockface('getTime'), '01:01', f+' ok');
 
   f = 'HH';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01');
-  equal(e.data('clockface').getTime(), '01', f+' ok');  
+  equal(e.clockface('getTime'), '01', f+' ok');  
 
   f = 'h:mm a';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01 pm');
-  equal(e.data('clockface').getTime(), '1:01 pm', f+' ok');
+  equal(e.clockface('getTime'), '1:01 pm', f+' ok');
 
   f = 'hh:mmA';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01 a.m.');
-  equal(e.data('clockface').getTime(), '01:01AM', f+' ok');
+  equal(e.clockface('getTime'), '01:01AM', f+' ok');
 
   f = 'hh:mm';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1:01 pm');
-  equal(e.data('clockface').getTime(), '01:01', f+' ok');  
+  equal(e.clockface('getTime'), '01:01', f+' ok');  
 
   f = 'h a';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '1 pm');
-  equal(e.data('clockface').getTime(), '1 pm', f+' ok');    
+  equal(e.clockface('getTime'), '1 pm', f+' ok');    
 
   //null values
   f = 'hh:mm';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '56:01 pm');
-  equal(e.data('clockface').getTime(), ':01', 'null hour ok');  
+  equal(e.clockface('getTime'), ':01', 'null hour ok');  
 
   f = 'h:mm a';
   e = $('<div></div>').appendTo('#qunit-fixture').clockface({format: f}).clockface('show', '6:71 pm');
-  equal(e.data('clockface').getTime(), '6 pm', f+'null minute ok');    
+  equal(e.clockface('getTime'), '6 pm', f+'null minute ok');    
 });
 
 
