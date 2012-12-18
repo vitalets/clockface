@@ -24,11 +24,34 @@ test("should store instance in data object", function () {
 });      
 
 test("show/hide/destroy methods (inline)", function () {
-  var e = $('<div></div>').appendTo('#qunit-fixture').clockface();
+  var e = $('<div></div>').appendTo('#qunit-fixture').clockface(),
+      o = e.data('clockface');
+
+  //first show    
   e.clockface('show');
   ok(e.find('.clockface:visible').length, 'shown');
+  ok(!o.$inner.filter('.active').length, 'no hour selected');
+  ok(!o.$outer.filter('.active').length, 'no minute selected');
+  equal(o.hour, null, 'hour ok');
+  equal(o.minute, null, 'minute ok');
+  equal(o.ampm, 'am', 'ampm ok');  
+
+  //set some value
+  o.$inner.eq(1).click();
+  equal(o.hour, 0, 'hour ok');
+  ok(o.$inner.eq(1).is('.active'), 'hour selected');
+
+  //hide
   e.clockface('hide');
   ok(!e.find('.clockface:visible').length, 'hidden');
+
+  //show again: selected hour should be the same
+  e.clockface('show');
+  ok(e.find('.clockface:visible').length, 'shown');
+  equal(o.hour, 0, 'hour ok');
+  ok(o.$inner.eq(1).is('.active'), 'hour selected');  
+ 
+  //destroy 
   e.clockface('destroy');
   ok(!e.find('.clockface').length, 'destroyed completely');
 });  

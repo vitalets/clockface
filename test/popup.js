@@ -37,3 +37,30 @@ test("trigger: manual", function () {
   e.clockface('destroy');
   ok(!$('.clockface').length, 'destroyed');
 });
+
+test("click outside close widget", function () {
+  var e = $('<input value="23:30">').appendTo('#qunit-fixture').clockface({
+    format: 'H:mm'
+  }),
+  e2 = $('<input value="23:30">').appendTo('#qunit-fixture').clockface(),
+  o = e.data('clockface');
+  e.focus();
+  ok($('.clockface:visible').length, 'shown');
+
+  //click on element --> not close 
+  e.click();
+  ok($('.clockface:visible').length, 'shown');
+
+  //click inside clockface --> not close 
+  o.$clockface.click();
+  ok($('.clockface:visible').length, 'shown');  
+
+  //click on another element --> close 
+  e2.click();
+  ok(!o.$clockface.is(':visible'), 'closed');
+
+  o.show();
+
+  e.clockface('destroy');
+  e2.clockface('destroy');
+}); 

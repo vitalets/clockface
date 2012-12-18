@@ -104,37 +104,61 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
             }
         },
 
-        /*
-        Place widget below input
+         /*
+        Set time of clockface. Am/pm will be set automatically.
+        Value can be Date object or string
         */
-        place: function(){
-          var zIndex = parseInt(this.$element.parents().filter(function() {
-                   return $(this).css('z-index') != 'auto';
-             }).first().css('z-index'))+10,
-             offset = this.$element.offset();
-          this.$clockface.css({
-            top: offset.top + this.$element.outerHeight(),
-            left: offset.left,
-            zIndex: zIndex
-          });
-        },  
+        setTime: function(value) {
+          var res, hour, minute, ampm = 'am';
 
-        /*
-        keydown handler (for not inline mode)
-        */
-        keydown: function(e) {
-          //tab, escape, enter --> hide
-          if(/^(9|27|13)$/.test(e.which)) {
-            this.hide();
+          //no new value 
+          if(value === undefined) {
+            //if ampm null, it;s first showw, need to render hours ('am' by default)
+            if(this.ampm === null) {
+              this.setAmPm('am');
+            }
             return;
-          } 
+          }
 
-          clearTimeout(this.timer);
-          this.timer = setTimeout($.proxy(function(){
-            console.log(e);
-            this.setTime(this.$element.val());
-          }, this), 500);
-        },      
+          //take value from Date object
+          if(value instanceof Date) {
+            hour = value.getHours();
+            minute = value.getMinutes();
+          }
+
+          //parse value from string
+          if(typeof value === 'string' && value.length) { 
+            res = this.parseTime(value);
+
+            //'24' always '0'
+            if(res.hour === 24) {
+              res.hour = 0;
+            }
+
+            hour = res.hour;             
+            minute = res.minute;             
+            ampm = res.ampm;             
+          }
+
+          //try to set ampm automatically
+          if(hour > 11 && hour < 24) {
+            ampm = 'pm';
+            //for 12h format substract 12 from value 
+            if(!this.is24 && hour > 12) {
+              hour -= 12;
+            }
+          } else if(hour >= 0 && hour < 11) {
+                //always set am for 24h and for '0' in 12h 
+                if(this.is24 || hour === 0) {
+                   ampm = 'am';
+               } 
+               //otherwise ampm should be defined in value itself and retrieved when parsing
+          }      
+
+          this.setAmPm(ampm);
+          this.setHour(hour);
+          this.setMinute(minute);
+        },   
 
         /*
         Set ampm and re-fill hours
@@ -262,7 +286,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           } else {
             this.setMinute(value);
           }
-          
+
           //update value in input
           if(!this.isInline) {
             this.$element.val(this.getTime());
@@ -283,6 +307,39 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           }           
         },
         
+
+        /*
+        Place widget below input
+        */
+        place: function(){
+          var zIndex = parseInt(this.$element.parents().filter(function() {
+                   return $(this).css('z-index') != 'auto';
+             }).first().css('z-index'))+10,
+             offset = this.$element.offset();
+          this.$clockface.css({
+            top: offset.top + this.$element.outerHeight(),
+            left: offset.left,
+            zIndex: zIndex
+          });
+        },  
+
+        /*
+        keydown handler (for not inline mode)
+        */
+        keydown: function(e) {
+          //tab, escape, enter --> hide
+          if(/^(9|27|13)$/.test(e.which)) {
+            this.hide();
+            return;
+          } 
+
+          clearTimeout(this.timer);
+          this.timer = setTimeout($.proxy(function(){
+            console.log(e);
+            this.setTime(this.$element.val());
+          }, this), 500);
+        },  
+
         /*
         Parse format from options and set this.is24
         */
@@ -314,47 +371,7 @@ In clockface considered '00:00 am' as midnight and '12:00 pm' as noon.
           this.mFormat = mFormat;
         },
 
-        /*
-        Set time of clockface. Am/pm will be set automatically.
-        Value can be Date object or string
-        */
-        setTime: function(value) {
-          var res = {hour: null, minute: null, ampm: 'am'};
-
-          if(value instanceof Date) {
-            res.hour = value.getHours();
-            res.minute = value.getMinutes();
-          }
-
-          if(typeof value === 'string' && value.length) { 
-             //parse value from string
-             res = this.parseTime(value);
-          }
-
-          //'24' always '0'
-          if(res.hour === 24) {
-              res.hour = 0;
-          }
-
-          //try to set ampm automatically
-          if(res.hour > 11 && res.hour < 24) {
-            res.ampm = 'pm';
-            //for 12h format correct value 
-            if(!this.is24 && res.hour > 12) {
-              res.hour -= 12;
-            }
-          } else if(res.hour >= 0 && res.hour < 11) {
-                //always set am for 24h and for '0' in 12h 
-                if(this.is24 || res.hour === 0) {
-                   res.ampm = 'am';
-               } 
-                //otherwise ampm should be defined in value itself and stored in res when parsing
-          }      
-
-          this.setAmPm(res.ampm);
-          this.setHour(res.hour);
-          this.setMinute(res.minute);
-        },
+       
 
         /*
         Parse value passed as string or Date object
