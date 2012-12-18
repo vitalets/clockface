@@ -64,3 +64,80 @@ test("click outside close widget", function () {
   e.clockface('destroy');
   e2.clockface('destroy');
 }); 
+
+test("esc, enter, tab close widget", function () {
+  var e = $('<input value="23:30">').appendTo('#qunit-fixture').clockface({
+    format: 'H:mm'
+  }),
+  ev, o = e.data('clockface');
+
+  e.focus();
+  ok($('.clockface:visible').length, 'shown');
+
+  //esc
+  ev = jQuery.Event("keydown");
+  ev.which = 27;
+  e.trigger(ev);
+  ok(!o.$clockface.is(':visible'), 'closed on esc');
+
+  e.focus();
+  ok($('.clockface:visible').length, 'shown');
+  //enter
+  ev = jQuery.Event("keydown");
+  ev.which = 13;
+  e.trigger(ev);
+  ok(!o.$clockface.is(':visible'), 'closed on enter');
+
+  e.focus();
+  ok($('.clockface:visible').length, 'shown');
+  //tab
+  ev = jQuery.Event("keydown");
+  ev.which = 9;
+  e.trigger(ev);
+  ok(!o.$clockface.is(':visible'), 'closed on tab');  
+
+  e.clockface('destroy');
+}); 
+
+asyncTest("change value in input reflects clockface", function () {
+  var e = $('<input value="23:30">').appendTo('#qunit-fixture').clockface({
+    format: 'H:mm'
+  }),
+  o = e.data('clockface');
+  e.focus();
+  ok($('.clockface:visible').length, 'shown on focus');
+
+  e.val('11:05');
+  e.keydown();
+
+  setTimeout(function(){
+    ok(o.$inner.eq(0).is('.active'), 'hour selected');
+    equal(o.hour, 11, 'hour ok');
+    equal(o.minute, 5, 'minute ok');
+    equal(o.ampm, 'am', 'ampm ok');  
+    e.clockface('destroy');  
+    start();
+  }, 700);
+
+});
+
+test("change value in clockface reflects on input", function () {
+  var e = $('<input value="23:30">').appendTo('#qunit-fixture').clockface({
+    format: 'h:mm'
+  }),
+  o = e.data('clockface');
+
+  e.focus();
+  ok($('.clockface:visible').length, 'shown on focus');
+
+  o.$inner.eq(2).click();
+  equal(e.val(), o.getTime(), 'hour in input changed');
+
+  o.$outer.eq(2).click();
+  equal(e.val(), o.getTime(), 'minute in input changed');
+
+  o.$ampm.click();
+  equal(e.val(), o.getTime(), 'ampm in input changed');
+
+  e.clockface('destroy');
+});
