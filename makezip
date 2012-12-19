@@ -1,9 +1,3 @@
-echo dont forget to run in lib: build dist 
-
-#copy dist
-mkdir -p clockface
-rm -rf clockface/**
-cp -R ../lib/dist/** clockface/
 
 #extract version
 version=$(head -2 clockface/js/clockface.js | sed -n 's/^.*\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p') 
@@ -19,4 +13,3 @@ sed -i "s/strong> ([0-9]\+\.[0-9]\+\.[0-9]\+)/strong> ($version)/g" index.html
 cd clockface
 rm -f ../zip/clockface-$version.zip
 zip -rT ../zip/clockface-$version.zip **
-
