@@ -1,3 +1,9 @@
+if [ $# -eq 0 ]
+then
+echo "You should provide parameter css|jshint|dist"
+exit 1
+fi
+
 if [ $(expr match $1 ".*css.*") -gt 0 ] 
 then
   rm -rf css/**
