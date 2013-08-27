@@ -280,17 +280,22 @@
           var values = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5],
               result = [];
 
+          //minutes
           if(what === 'minute') {
               $.each(values, function(i, v) { result[i] = v*5; });
-          } else if(this.ampm === 'pm') {
+          } else {
+            //hours
+            if(this.ampm === 'pm') {
               if(this.is24) {
                 $.each(values, function(i, v) { result[i] = v+12; });
               } else {
                 result = values.slice();
-                result[1] = 12; //need this to show '12' instead of '0' for 12h pm
+                result[1] = 12; //need this to show '12' instead of '00' for 12h pm
               }
-          } else {
-             result = values.slice();
+            } else {
+              result = values.slice();
+              result[1] = 12; //need this to show '12' instead of '00' for 12h am
+            }
           }
           return result;
         },
