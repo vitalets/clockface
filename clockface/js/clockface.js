@@ -1,5 +1,5 @@
 /**
-* Clockface - v1.0.0
+* Clockface - v1.0.1
 * Clockface timepicker for Twitter Bootstrap
 *
 * Confusion with noon and midnight: 
@@ -278,19 +278,19 @@
         */
         getValues: function(what) {
           var values = [11, 0, 1, 10, 2, 9, 3, 8, 4, 7, 6, 5],
-              result = [];
+              result = values.slice();
 
+          //minutes
           if(what === 'minute') {
               $.each(values, function(i, v) { result[i] = v*5; });
-          } else if(this.ampm === 'pm') {
-              if(this.is24) {
-                $.each(values, function(i, v) { result[i] = v+12; });
-              } else {
-                result = values.slice();
-                result[1] = 12; //need this to show '12' instead of '0' for 12h pm
-              }
           } else {
-             result = values.slice();
+            //hours
+            if(!this.is24) {
+              result[1] = 12; //need this to show '12' instead of '00' for 12h am/pm
+            }
+            if(this.is24 && this.ampm === 'pm') {
+              $.each(values, function(i, v) { result[i] = v+12; });
+            }
           }
           return result;
         },
